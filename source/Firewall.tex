@@ -1,0 +1,42 @@
+%
+% Firewall
+%
+% Aleph Objects Firewall
+%
+% Copyright (C) 2014, 2015, 2016 Aleph Objects, Inc.
+%
+% This document is licensed under the Creative Commons Attribution 4.0
+% International Public License (CC BY-SA 4.0) by Aleph Objects, Inc.
+%
+
+\section{Overview}
+Firewall.
+
+\begin{itemize}
+ \item Must be free software.
+ \item The project must still be alive.
+ \item Does it use a hardened kernel?
+ \item How does it do security updates?
+ \item Are there open security issues?
+ \item Are there any CVEs?
+ \item How are security issues handled?
+ \item Is there a list of security issues?
+ \item Does it have a wifi portal? (Should that be a separate box or in OpenWRT?)
+ \item UTM - Unified Threat Management (e.g. snort, etc.)
+ \item Load balancing between multiple upstreams (without BGP).
+ \item Load balancing between dual local routers.
+ \item Fail over to standby router (e.g. pfsync).
+ \item "Anti-virus", SMTP, POP scans? Meh? (e.g. OpenBSD has greylist/tarpit.)
+ \item Packet cleansing (e.g. tcp header randomization).
+ \item Do we want DNS, DHCP, etc? Probably not?
+ \item OpenVPN (built into router, or thru it?).
+ \item Network graphing (MRTG, aguri, etc.)
+ \item No broken "community" editions.
+ \item Have mirrored server doing analysis?
+ \item NAT options? cone, etc.
+ \item Local system monitoring (e.g. system temp, hdd status, etc.)
+ \item sshd
+ \item GSM, pppd ?
+ \item Two-factor authentication.
+\end{itemize}
+
