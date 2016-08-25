@@ -14,7 +14,13 @@ There are a lot of operating systems to consider...
 \section{Debian}
  \href{https://www.debian.org/}{Debian}
 
-We use Debian for nearly everything else. It could easily be used as a router/firewall. There are better, more tuned options.
+We use Debian for nearly everything. It could easily be used as a router/firewall. There are better, more tuned options.
+
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-debian.png}
+ \caption{Debian Website}
+ \label{fig:www-debian}
+\end{figure}
 
 
 \section{OpenBSD}
@@ -52,13 +58,13 @@ Similar to OpenWRT in that way, except no web GUI, AFAICT.
 
 \section{clearOS}
 
+\href{https://www.clearos.com/}{clearOS} --- ``ClearOS is an operating system for your Server, Network, and Gateway systems. It is designed for homes, small to medium businesses, and distributed environments. ClearOS is commonly known as the Next Generation Small Business Server, while including indispensable Gateway and Networking functionality. It delivers a powerful IT solution with an elegant user interface that is completely web-based.''
+
 \begin{figure}[h!]
 \includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-clearos.png}
  \caption{clearOS Website}
  \label{fig:www-clearos}
 \end{figure}
-
-\href{https://www.clearos.com/}{clearOS} --- ``ClearOS is an operating system for your Server, Network, and Gateway systems. It is designed for homes, small to medium businesses, and distributed environments. ClearOS is commonly known as the Next Generation Small Business Server, while including indispensable Gateway and Networking functionality. It delivers a powerful IT solution with an elegant user interface that is completely web-based.''
 
 \begin{itemize}
  \item Overall, very very nice, very clean with many features.
@@ -68,6 +74,7 @@ Similar to OpenWRT in that way, except no web GUI, AFAICT.
  \item Latest release: 7.2.0
  \item Release Date: March 7, 2015.
  \item Package Updater: yum
+ \item Kernel: Linux 3.10.0-327.3.1.el17.x86\_64
  \item Base OS: Fedora? CentOS?
  \item Easy GUI install
  \item Has enterprise (baitware?) version.
@@ -91,15 +98,22 @@ Similar to OpenWRT in that way, except no web GUI, AFAICT.
  \item There doesn't appear to be a way to say ``just allow port 22 from NNN"...
  \item A lot of great setup.
  \item MultiWAN --- Nice, but simple load balancing between multiple upstreams.
+ \item Failover to multiple upstreams.
  \item No fail over to another router (ala CARP).
  \item dhclient (?) overwrites DNS addresses, no place to set static (?!?)
+ \item Some pretty graphs, but not the most useful.
 \end{itemize}
 
 
 \section{IPCop}
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-ipcop.png}
+\href{http://www.ipcop.org/}{IPCop} --- ``The IPCop Firewall is a Linux firewall distribution. It is geared towards home and SOHO users. The IPCop web-interface is very user-friendly and makes usage easy.''
 
- \href{http://www.ipcop.org/}{IPCop} --- ``The IPCop Firewall is a Linux firewall distribution. It is geared towards home and SOHO users. The IPCop web-interface is very user-friendly and makes usage easy.''
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-ipcop.png}
+ \caption{IPCop Website}
+ \label{fig:www-ipcop}
+\end{figure}
+
 
 \begin{itemize}
  \item Last release was 2015-02-23, well over a year ago.
@@ -109,19 +123,74 @@ Similar to OpenWRT in that way, except no web GUI, AFAICT.
 
 
 \section{IPFire}
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-ipfire.png}
+\href{http://www.ipfire.org/}{IPFire} --- ``the professional and hardened Linux firewall distribution that is secure, easy to operate and coming with great functionality so that it is ready for enterprises, authorities, and anybody else.''
 
- \href{http://www.ipfire.org/}{IPFire} --- ``the professional and hardened Linux firewall distribution that is secure, easy to operate and coming with great functionality so that it is ready for enterprises, authorities, and anybody else.''
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-ipfire.png}
+ \caption{IPFire Website}
+ \label{fig:www-ipfire}
+\end{figure}
+
 
 \begin{itemize}
+ \item Latest release: July 12th, 2016.
  \item \url{http://downloads.ipfire.org/releases/ipfire-2.x/2.19-core103/ipfire-2.19.x86_64-full-core103.iso}
+ \item Installer has a cool thing that flashes the light on the ethernet port to identify it.
+ \item Kernel: Linux 3.14.65-ipfire
+ \item Post install, apache httpd process is starting, but not listening on any ports. Still in ``-k start''. So no web admin. Needed to modify listen.conf in Apache to 0.0.0.0:80 and 0.0.0.0:444. It appears it was hanging because of IPv6 (?).
+ \item Nice MRTG-esque graphs of services and ports, including system temps, etc.
+ \item Second set of non-MRTG network traffic graphs.
+ \item Transparent web caching.
+ \item Much more technical setup than clearOS. More SysAdmin oriented.
+ \item OpenVPN.
+ \item QoS.
+ \item Load balancing? Fail over?
+ \item IDS (snort).
+ \item Uses its own pakfire package management tool.
+ \item The wiki is under an NC license.
+ \item Kernel uses grsec.
+ \item No WAN failover (!).
 \end{itemize}
 
 
 \section{OPNsense}
- \href{https://opnsense.org/}{OPNsense} --- ``the Open Source Firewall that is easy-to-use and protects your network``
+ \href{https://opnsense.org/}{OPNsense} --- ``the Open Source Firewall that is easy-to-use and protects your network''
 
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-opnsense.png}
+ \caption{OPNsense Website}
+ \label{fig:www-opnsense}
+\end{figure}
+
+\begin{itemize}
+ \item Release is current.
+ \item Making a dd of the .iso to a USB drive didn't boot. OPNsense-16.7.r2-OpenSSL-cdrom-amd64.iso
+\end{itemize}
 
 \section{pfSense}
  \href{https://www.pfsense.org/}{pfSense} --- ``free, open source customized distribution of FreeBSD specifically tailored for use as a firewall and router that is entirely managed via web interface.''
+
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-pfsense.png}
+ \caption{pfSense Website}
+ \label{fig:www-pfsense}
+\end{figure}
+
+\begin{itemize}
+ \item Released May 18th, 2016.
+ \item pfSense-CE-memstick-2.3.1-RELEASE-amd64.img
+ \item FreeBSD 10.3 based.
+ \item Installer feels like a step back in computing history.
+ \item First boot goes to console with lots of useful options.
+ \item Web admin wizard mentions pfSense Gold Subscriptions. It doesn't appear to be for non-free software (e.g. isn't baitware).
+ \item They sell very nice looking hardware with pfsense pre-installed. With failover systems (CARP).
+ \item Load balancing, failover.
+ \item Clean and very responsive web interface (based on Bootstrap).
+ \item Web based updater to new minor version.
+ \item x86 architecture only.
+ \item Looks to have good security errata process, following FreeBSD.
+ \item Snort threat lists are available. Paid for more recent ones, same as on other snort platforms.
+ \item Installation of additional packages is clean, and doesn't appear to offer any non-free.
+ \item ClamAV ...
+\end{itemize}
 
