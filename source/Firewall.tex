@@ -10,35 +10,206 @@
 %
 
 \section{Overview}
-Firewall.
+Aleph Objects has recently deployed pfSense firewalls, replacing OpenBSD.
+Most servers and workstations run GNU/Linux, which uses iptables.
+
+
+\section{iptables}
+iptables is part of the Netfilter project and has been included by default in
+the Linux kernel for many years.
+
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-netfilter.png}
+ \caption{Netfilter Website}
+ \label{fig:www-netfilter}
+\end{figure}
+
+
+\section{pfSense}
+\href{https://www.pfsense.org/}{pfSense} --- ``Free, open source customized
+distribution of FreeBSD specifically tailored for use as a firewall and router
+that is entirely managed via web interface.''
+
+pfSense was selected as Aleph Objects core router/firewall for backbone
+connections.
+
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-pfsense.png}
+ \caption{pfSense Website}
+ \label{fig:www-pfsense}
+\end{figure}
+
+
+\subsection{NAT}
+Network Address Translation.
 
 \begin{itemize}
- \item Must be free software.
- \item The project must still be alive.
- \item Does it use a hardened kernel?
- \item How does it do security updates?
- \item Are there open security issues?
- \item Are there any CVEs?
- \item How are security issues handled?
- \item Is there a list of security issues?
- \item Does it have a wifi portal? (Should that be a separate box or in OpenWRT?)
- \item Does upstream https actually work?
- \item UTM - Unified Threat Management (e.g. snort, etc.)
- \item Load balancing between multiple upstreams (without BGP).
- \item Load balancing between dual local routers.
- \item Fail over to standby router (e.g. pfsync).
- \item "Anti-virus", SMTP, POP scans? Meh? (e.g. OpenBSD has greylist/tarpit.)
- \item Packet cleansing (e.g. tcp header randomization).
- \item Do we want DNS, DHCP, etc? Probably not?
- \item OpenVPN (built into router, or thru it?).
- \item Network graphing (MRTG, aguri, etc.)
- \item No broken "community" editions.
- \item Have mirrored server doing analysis?
- \item NAT options? cone, etc.
- \item Local system monitoring (e.g. system temp, hdd status, etc.)
- \item sshd
- \item GSM, pppd ?
- \item Two-factor authentication.
- \item snort, suricata
+ \item VoIP using SIP is often a problem behind a NAT.
+ \item Enable Keepalives in Grandstream phones to connect to the Asterisk server.
+ \item Disable ALG (Application Level Gateway) in any consumer/home routers.
+\end{itemize}
+
+
+\subsection{Traffic Shaping}
+\begin{itemize}
+ \item Prioritize admin ssh to firewalls/servers (in case of DoS, etc.)
+ \item Prioritize VoIP
+ \item De-prioritize SMTP, etc...
+\end{itemize}
+
+\subsection{pfBlockerNG}
+\begin{itemize}
+ \item IP blocklists for botnets, etc.
+\end{itemize}
+
+
+\subsection{Suricata}
+Suricata is being used as an Intrusion Detection System.
+It is preferred over Snort as Suricata is multithreaded and Snort isn't.
+
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-suricata.png}
+ \caption{Suricata Website}
+ \label{fig:www-suricata}
+\end{figure}
+
+\begin{itemize}
+ \item barnyard2
+ \item Snort Blacklists
+ \item Emerging Threats Blacklists
+ \item GeoIP
+ \item Alerts, Blocks, Suppress
+ \item SID
+\end{itemize}
+
+
+\subsection{DHCP}
+For DHCP services, pfSense uses Dnsmasq, which is also used for DNS
+forwarding.
+
+\begin{itemize}
+ \item Disable IPv6.
+ \item tftp netboot installs.
+ \item Static mappings.
+\end{itemize}
+
+
+\subsection{NTP}
+
+
+\subsection{OpenVPN}
+Virtual Private Networks.
+
+
+\href{https://www.openvpn.net/}{OpenVPN} --- ``OpenVPN is a full-featured open source SSL VPN solution that accommodates a wide range of configurations, including remote access, site-to-site VPNs, Wi-Fi security, and enterprise-scale remote access solutions with load balancing, failover, and fine-grained access-controls.''
+
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-openvpn.png}
+ \caption{OpenVPN Website}
+ \label{fig:www-openvpn}
+\end{figure}
+
+
+\begin{itemize}
+ \item Network design (e.g. many point to point, one central server, etc.).
+ \item Main OpenVPN server.
+ \item Other internal servers.
+ \item External servers private connections.
+ \item Laptops.
+ \item Mobiles.
+ \item SSL certificates.
+\end{itemize}
+
+
+\subsection{Captive Portal}
+The Captive Portal for Aleph Mountain building wifi services.
+
+
+\subsection{SSL Certificates}
+pfSense makes it very easy to generate Certificate Signing Requests (CSRs),
+which can be send to Gandi.net to get issued a ``properly'' signed SSL
+certificate.
+
+
+\subsection{ssh}
+OpenSSH from OpenBSD is used. The BSD shell is a bit different from GNU.
+
+
+\subsection{DNS}
+DNS forwarding is provided by Dnsmasq.
+
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-dnsmasq.png}
+ \caption{Dnsmasq Website}
+ \label{fig:www-dnsmasq}
+\end{figure}
+
+
+
+\subsection{Routing}
+\begin{itemize}
+ \item No BGP, OSPF, etc.
+ \item Static backbone routes.
+ \item WAN failover
+\end{itemize}
+
+
+\subsection{Interfaces}
+
+\begin{itemize}
+ \item Gigabit ethernet.
+ \item SPF+.
+ \item Hardware offloading (e.g. checksums).
+\end{itemize}
+
+
+\subsection{CARP and Synchronization}
+CARP can be used to have transparent failover to another firewall, if one
+firewall on the network should drop.
+
+Synchronization between CARP firewalls allows easy configuration updates. For
+instance, if a configuration change is made to the DHCP server, it can
+``instantly'' push to the backup firewall.
+
+
+\subsection{Reporting}
+
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-ntopng.png}
+ \caption{ntopng Website}
+ \label{fig:www-ntopng}
+\end{figure}
+
+\begin{itemize}
+ \item Dashboard.
+ \item Darkstat.
+ \item ntopng (``Network Top Next Generation'' ?).
+ \item S.M.A.R.T.
+ \item System Temperatures.
+ \item MRTG
+ \item RRD
+\end{itemize}
+
+
+\subsection{Install notes}
+
+A few notes from the initial test install:
+
+\begin{itemize}
+ \item Released May 18th, 2016.
+ \item pfSense-CE-memstick-2.3.1-RELEASE-amd64.img
+ \item FreeBSD 10.3 based.
+ \item Installer feels like a step back in computing history.
+ \item First boot goes to console with lots of useful options.
+ \item Web admin wizard mentions pfSense Gold Subscriptions. It doesn't appear to be for non-free software (e.g. isn't baitware).
+ \item They sell very nice looking hardware with pfsense pre-installed. With failover systems (CARP).
+ \item Load balancing, failover.
+ \item Clean and very responsive web interface (based on Bootstrap).
+ \item Web based updater to new minor version.
+ \item x86 architecture only.
+ \item Looks to have good security errata process, following FreeBSD.
+ \item Snort threat lists are available. Paid for more recent ones, same as on other snort platforms.
+ \item Installation of additional packages is clean, and doesn't appear to offer any non-free.
+ \item ClamAV ...
 \end{itemize}
 
