@@ -98,17 +98,17 @@ forwarding.
 
 
 \subsection{OpenVPN}
-Virtual Private Networks.
-
-
-\href{https://www.openvpn.net/}{OpenVPN} --- ``OpenVPN is a full-featured open source SSL VPN solution that accommodates a wide range of configurations, including remote access, site-to-site VPNs, Wi-Fi security, and enterprise-scale remote access solutions with load balancing, failover, and fine-grained access-controls.''
-
 \begin{figure}[h!]
 \includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-openvpn.png}
  \caption{OpenVPN Website}
  \label{fig:www-openvpn}
 \end{figure}
 
+
+Virtual Private Networks.
+
+
+\href{https://www.openvpn.net/}{OpenVPN} --- ``OpenVPN is a full-featured open source SSL VPN solution that accommodates a wide range of configurations, including remote access, site-to-site VPNs, Wi-Fi security, and enterprise-scale remote access solutions with load balancing, failover, and fine-grained access-controls.''
 
 \begin{itemize}
  \item Network design (e.g. many point to point, one central server, etc.).
@@ -118,7 +118,20 @@ Virtual Private Networks.
  \item Laptops.
  \item Mobiles.
  \item SSL certificates.
+ \item AES-256-CBC is hardware accelerated on pfSense routers.
+ \item SHA512 Auth digest algorithm
+ \item Hardware Crypto: BSD cryptodev engine
 \end{itemize}
+
+
+pfSense ships with pre-generated DH keys, due to ``heavy computation''.
+This can take an hour for 4096.
+\begin{minted}[frame=single]{sh}
+/usr/bin/openssl dhparam 1024 > /etc/dh-parameters.1024
+/usr/bin/openssl dhparam 2048 > /etc/dh-parameters.2048
+/usr/bin/openssl dhparam 4096 > /etc/dh-parameters.4096
+\end{minted}
+
 
 
 \subsection{Captive Portal}

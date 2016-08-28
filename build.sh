@@ -6,9 +6,9 @@ rm -f AOF.pdf source/AOF.pdf
 
 cd source
 # Build main LaTeX file
-xelatex AOF.tex
+xelatex -shell-escape AOF.tex
 # meh? bunny? rabbit? what to uncruft running twice for indices etc.
-xelatex AOF.tex
+#xelatex -shell-escape AOF.tex
 
 mv *.pdf ../
 
