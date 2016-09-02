@@ -39,6 +39,40 @@ connections.
  \label{fig:www-pfsense}
 \end{figure}
 
+\subsection{Configuration}
+\begin{enumerate}
+ \item Connect via USB cable. 115200 baud, 8N1, no flow control.
+ \item Copy MAC address to main DHCP/DNS server, and reserve IP address.
+ \item Set IP for LAN (e.g. 192.168.1.1)
+ \item Set IP for WAN, disable IPv6
+ \item Log in to firewall (e.g. https://192.168.1.1).
+       Initial pass admin/pfsense.
+ \item Start Wizard, hit Next.
+ \item pfSense Gold, Next.
+ \item Hostname: set hostname.
+ \item Set WAN, LAN, password, etc.
+ \item Hit Reload, and the wizard is done.
+ \item System --> User Manager. Click Add. Add Username, Password, Full name, Experation date leave blank. Move to add to Group membership ``admins'' (presuming this is an admin). Add ssh key, if you want to ssh in. Certificate, leave blank for now (can be used for OpenVPN/RADIUS). 
+ \item Log out and log back in as newly created user.
+ \item Goto System --> Advanced. Under Admin Access. Set TCP port to randomish port between 1 and 65535. This will be the new pfSense web interface port address. Max processes: 16(2 is too low, not sure what is ideal). Check WebGUI redirect to disable port 80. Check enable Secure Shell Server. Disable password login. Pick randomish port for SSH. Check to password protect Console menu. Save.
+ \item At this point, you can optionally SSH into the firewall if a key was set up for the user.
+ \item Under System --> Advanced, Networking. Uncheck Allow IPv6, to disable IPv6 (yay!). Check boxes for: Hardware Checksum Offloading, Hardware TCP Segmentation Offloading, Hardware Large Receive Offloading. These need to be disabled because/if Suricata is used in Inline mode. If it isn't, these can be unchecked and if the hardware is good/can handle it, it will likely be faster. (Side note, enabling Hardware Checksum Offloading breaks networking in a KVM.) Save.
+ \item System --> Advanced, Miscellaneous. Cryptographic Hardware should be set to AES-NI for any hardware from pfSense. For other hardware, check dmesg. Thermal Sensors: Intel Core* CPU on-die thermal sensor. Hard disk standby time, 6 minutes (not sure this really has any effect). Host UUID, check Do NOT send HOST UUID with user agent. Save.
+ \item System --> Notifications. Check for Disable Growl Notifications and Disable SMTP. Save.
+ \item System --> Cert. Manager. Under CAs, click Add. Method: Import an existing Certificate Authority. Descriptive Name: ``GandiStandardSSLCA2''. Get the cert from \url{https://www.gandi.net/static/CAs/GandiStandardSSLCA2.pem} and paste into Certificate data. Certificate Private Key, blank. Save.
+ \item System --> Cert. Manager. Under Certificates, click Add. Method: Create a Certificate Signing Request. Descriptive Name, use the hostname of the firewall being setup. Key length 4096, Digest Algorithm sha512. Country Code US, etc. Common name, use hostname of firewall. Save.
+ \item System --> Cert. Manager, Under Certificates, the new cert added above, click Export Request mini-icon. Gandi: Standard SSL, single address, 3 year. Paste in the CSR exported from the mini-icon into Gandi. Select Apache/ModSSL for Software used in Gandi, and if it says the correct ``Main domain (CN)'', hit Submit in Gandi. Delete any .req file that was downloaded by browser. Gandi: Validation by email (probably). It will take ~10+ minutes to get verification back from Gandi (not instant).
+ \item System --> Cert. Manager, also import any of our own CAs and Certificate Revocations, if any.
+ \item System --> General Setup. Check all looks good. Top Navigation: Fixed (Remains visible at top of page). Hostname in Menu: Hostname only. (DNS servers can be bound to particular interfaces here, if needed in multi-WAN). Save.
+ \item Firewall --> Rules. LAN interface, click the pencil to edit the IPv6 line. Change Action to Reject. Change Source to any. Change Description to ``Default Reject LAN IPv6''. Save. Apply Changes.
+ \item Firewall --> Rules. Under LAN interface, click the Copy mini-icon to copy the IPv6 line. Change Action to Block. Interface to WAN. Change Description to ``Default Block WAN IPv6''. Save. Apply Changes.
+ \item Services --> DNS Resolver. Enable (default). Network Interfaces: just select LAN and localhost. Outgoing Network Interfaces: WAN, LAN, localhost. Add checks for DHCP Registration, Static DHCP. Save. Apply Changes.
+ \item Services --> DNS Resolver, Advanced Settings. Add checks for: Prefetch Support, Prefetch DNS Key Support. Increase Messge Cache Size to 50 MB or so (?).Save. Apply Changes.
+% \item Services, Dynamic DNS. Setup.
+ \item Status --> System Logs
+ \item When WAN is first connected, do System --> Update.
+\end{enumerate}
+
 
 \subsection{NAT}
 Network Address Translation.
@@ -204,7 +238,7 @@ instance, if a configuration change is made to the DHCP server, it can
 \end{itemize}
 
 
-\subsection{Install notes}
+\subsection{Test Evaluation Install notes}
 
 A few notes from the initial test install:
 
