@@ -141,7 +141,11 @@ For DHCP services, pfSense uses Dnsmasq, which is also used for DNS
 forwarding.
 
 
-Services --> DHCP Server. Note: for netboot install of a workstation. Set up DHCP address. Network Booting, show advanced. Enable network booting for that host. Set Next Server to the IP address of the tftp server. Set XXX to ``jessie_crypto'' for encrypted install or ``jessie'' for a regular install.
+%Services --> DHCP Server. Note: for netboot install of a workstation. Set up DHCP address. Network Booting, show advanced. Enable network booting for that host. Set Next Server to the IP address of the tftp server. Set XXX to ``jessie_crypto'' for encrypted install or ``jessie'' for a regular install.
+\begin{ennumerate}
+ \item Services --> DHCP Server. Network Booting, click Display Advanced. Check box for Enables Network Booting. Set Default BIOS file name to jessie\_crypto/pxelinux.0 or jessie/pxelinux.0. Set Next Server to IP address of tftp server. Save.
+ \item Services --> DHCP Server. Go to the bottom and hit Add. Add the MAC address, Client Identifier (hostname), IP Address, Hostname, Netboot Filename (we probably don't need it in the general config), and TFTP Server.
+\end{ennumerate}
 
 \begin{itemize}
  \item Disable IPv6.
