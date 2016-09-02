@@ -140,6 +140,9 @@ It is preferred over Snort as Suricata is multithreaded and Snort isn't.
 For DHCP services, pfSense uses Dnsmasq, which is also used for DNS
 forwarding.
 
+
+Services --> DHCP Server. Note: for netboot install of a workstation. Set up DHCP address. Network Booting, show advanced. Enable network booting for that host. Set Next Server to the IP address of the tftp server. Set XXX to ``jessie_crypto'' for encrypted install or ``jessie'' for a regular install.
+
 \begin{itemize}
  \item Disable IPv6.
  \item tftp netboot installs.
