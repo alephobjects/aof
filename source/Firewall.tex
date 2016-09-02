@@ -40,6 +40,9 @@ connections.
 \end{figure}
 
 \subsection{Configuration}
+
+These are the the initial configuration steps for a pfSense firewall.
+
 \begin{enumerate}
  \item Connect via USB cable. 115200 baud, 8N1, no flow control.
  \item Copy MAC address to main DHCP/DNS server, and reserve IP address.
@@ -59,18 +62,34 @@ connections.
  \item Under System --> Advanced, Networking. Uncheck Allow IPv6, to disable IPv6 (yay!). Check boxes for: Hardware Checksum Offloading, Hardware TCP Segmentation Offloading, Hardware Large Receive Offloading. These need to be disabled because/if Suricata is used in Inline mode. If it isn't, these can be unchecked and if the hardware is good/can handle it, it will likely be faster. (Side note, enabling Hardware Checksum Offloading breaks networking in a KVM.) Save.
  \item System --> Advanced, Miscellaneous. Cryptographic Hardware should be set to AES-NI for any hardware from pfSense. For other hardware, check dmesg. Thermal Sensors: Intel Core* CPU on-die thermal sensor. Hard disk standby time, 6 minutes (not sure this really has any effect). Host UUID, check Do NOT send HOST UUID with user agent. Save.
  \item System --> Notifications. Check for Disable Growl Notifications and Disable SMTP. Save.
- \item System --> Cert. Manager. Under CAs, click Add. Method: Import an existing Certificate Authority. Descriptive Name: ``GandiStandardSSLCA2''. Get the cert from \url{https://www.gandi.net/static/CAs/GandiStandardSSLCA2.pem} and paste into Certificate data. Certificate Private Key, blank. Save.
  \item System --> Cert. Manager. Under Certificates, click Add. Method: Create a Certificate Signing Request. Descriptive Name, use the hostname of the firewall being setup. Key length 4096, Digest Algorithm sha512. Country Code US, etc. Common name, use hostname of firewall. Save.
  \item System --> Cert. Manager, Under Certificates, the new cert added above, click Export Request mini-icon. Gandi: Standard SSL, single address, 3 year. Paste in the CSR exported from the mini-icon into Gandi. Select Apache/ModSSL for Software used in Gandi, and if it says the correct ``Main domain (CN)'', hit Submit in Gandi. Delete any .req file that was downloaded by browser. Gandi: Validation by email (probably). It will take ~10+ minutes to get verification back from Gandi (not instant).
+ \item System --> Cert. Manager, Under Certificates. When cert is ready and confirmed at Gandi, hit Get the Certificate. Hit the ``Update CSR'' pencil on the appropriate certificate line. Paste the Gandi cert into Final certificate data. Delete any downloaded copies.
+ \item System --> Cert. Manager. Under CAs, click Add. Method: Import an existing Certificate Authority. Descriptive Name: ``GandiStandardSSLCA2''. Get the cert from \url{https://www.gandi.net/static/CAs/GandiStandardSSLCA2.pem} and paste into Certificate data. Certificate Private Key, blank. Save. Note, this has to be done after the above Gandi certificate is added to the firewall.
  \item System --> Cert. Manager, also import any of our own CAs and Certificate Revocations, if any.
  \item System --> General Setup. Check all looks good. Top Navigation: Fixed (Remains visible at top of page). Hostname in Menu: Hostname only. (DNS servers can be bound to particular interfaces here, if needed in multi-WAN). Save.
+ \item To use the newly set up certifcate. System --> Advanced, Admin Acess. Change SSL Certificate to the new one. Save. Now go to that new hostname with https and the correct port.
  \item Firewall --> Rules. LAN interface, click the pencil to edit the IPv6 line. Change Action to Reject. Change Source to any. Change Description to ``Default Reject LAN IPv6''. Save. Apply Changes.
  \item Firewall --> Rules. Under LAN interface, click the Copy mini-icon to copy the IPv6 line. Change Action to Block. Interface to WAN. Change Description to ``Default Block WAN IPv6''. Save. Apply Changes.
  \item Services --> DNS Resolver. Enable (default). Network Interfaces: just select LAN and localhost. Outgoing Network Interfaces: WAN, LAN, localhost. Add checks for DHCP Registration, Static DHCP. Save. Apply Changes.
  \item Services --> DNS Resolver, Advanced Settings. Add checks for: Prefetch Support, Prefetch DNS Key Support. Increase Messge Cache Size to 50 MB or so (?).Save. Apply Changes.
 % \item Services, Dynamic DNS. Setup.
- \item Status --> System Logs
- \item When WAN is first connected, do System --> Update.
+ \item Status --> System Logs, Settings. Add checks to Forward/Reverse Display. GUI Log Entries, increase to 200. Where to show rule descriptions ``Display as second row`. This is where remote logging will be set up... 
+ \item Status --> Dashboard. Click the Plus + in the upper right corner. Add the available widgets: Gateways, Thermal Sensors, Traffic Graphs, S.M.A.R.T. Status, Firewall Logs, Interface Statistics, OpenVPN, Services Status, NTP Status.
+ \item Diagnostics --> Backup \& Restore. Backup.
+ \item Diagnostics --> Reboot and make sure everything comes up clean.
+ \item At this point, this presumes the WAN interface isn't up and routing actual Internet traffic. It is better to get the router as configured as possible before actually using the WAN interface. Assuming the firewall is on the LAN and being configured, it can use the gateway that is on its LAN interface. When configuration is finalized and the router is deployed, the WAN interface will carry Internet traffic. To to this, add a route by: Interfaces --> LAN. Under IPv4 Upstream gateway, click Add a new gateway. Add the LAN gateway info, and check is as Default gateway (3000). Save. Apply Changes..
+ \item System --> Routing. Click to edit the mini pencil icon on the Gateway line listed as Default. Monitor IP: something appropriate upstream, can use 8.8.8.8. Note: on high latency connections such as satellite, hit Display Advanced and increase Latency thresholds (750, 2500), Packet Loss thresholds (15, 25), Probe Interval (1000), Loss Interval (3000). Save. Apply Changes.
+ \item System --> Update, System Update. Check that the Status is ``Up to date.'' If it needs updating, update.
+ \item System --> Package Manager, Installed Packages. The first time here, you need to click on Available Packages (presumably to download latest package header info). Then go back to Installed Packages. If there are any Installed Packages that have a Newer version available, click the mini icon to update the package. Confirm.
+ \item System --> Package Manager, Available Packages. Install: Cron, ntopng, openvpn-client-export, pfBlockerNG, RRD\_Summary, Status\_Traffic\_Totals, sudo, suricata.
+ \item System --> sudo. Add user, optionally.
+
+
+ \item OpenVPN setup.
+ \item Interfaces --> LAN. When you're done using the LAN as any sort of gateway. Change IPv4 Upstream gateway to None. Save. Apply Changes.
+ \item Diagnostics --> Backup \& Restore. Backup.
+ \item Diagnostics --> Reboot and make sure everything comes up clean.
 \end{enumerate}
 
 
