@@ -73,7 +73,7 @@ These are the the initial configuration steps for a pfSense firewall.
  \item Firewall --> Rules. Under LAN interface, click the Copy mini-icon to copy the IPv6 line. Change Action to Block. Interface to WAN. Change Description to ``Default Block WAN IPv6''. Save. Apply Changes.
  \item Services --> DNS Resolver. Enable (default). Network Interfaces: just select LAN and localhost. Outgoing Network Interfaces: WAN, LAN, localhost. Add checks for DHCP Registration, Static DHCP. Save. Apply Changes.
  \item Services --> DNS Resolver, Advanced Settings. Add checks for: Prefetch Support, Prefetch DNS Key Support. Increase Messge Cache Size to 50 MB or so (?).Save. Apply Changes.
-% \item Services, Dynamic DNS. Setup.
+ \item Services --> Dynamic DNS. Setup, if needed.
  \item Status --> System Logs, Settings. Add checks to Forward/Reverse Display. GUI Log Entries, increase to 200. Where to show rule descriptions ``Display as second row`. This is where remote logging will be set up... 
  \item Status --> Dashboard. Click the Plus + in the upper right corner. Add the available widgets: Gateways, Thermal Sensors, Traffic Graphs, S.M.A.R.T. Status, Firewall Logs, Interface Statistics, OpenVPN, Services Status, NTP Status.
  \item Diagnostics --> Backup \& Restore. Backup.
@@ -87,6 +87,20 @@ These are the the initial configuration steps for a pfSense firewall.
 
 
  \item OpenVPN setup.
+ \item System --> Cert. Manager. Set up internal certificate authority.
+ \item System --> Cert. Manager. Create internal server certificate.
+ \item SSH into firewall. pfSense ships with pre-generated DH keys, due to ``heavy computation''. This can take an hour for 4096.
+\begin{minted}[frame=single]{sh}
+/usr/bin/openssl dhparam 1024 > /etc/dh-parameters.1024
+/usr/bin/openssl dhparam 2048 > /etc/dh-parameters.2048
+/usr/bin/openssl dhparam 4096 > /etc/dh-parameters.4096
+\end{minted}
+ \item VPN --> OpenVPN. Set up VPN server. Server Mode: Remote Access (SSL/TLS + User Auth). Backend for Authentication: Local Database (will be FreeRADIUS at some point). Protocol: UDP. Local Port: something randomish. Peer Certificate Authority: use the interal CA created earlier. Server Certificate: Use the server certificate created earlier. DH Parameter length (bits): 4096. Encryption Algorithm: AES-256-CBC (256-bit), this has hardware crypto support on pfSense routers. Auth digest algorithm: SHA512 (512-bit). Hardware Crypto: BSD Cryptodev engine- RSA, DSA, DH, AES-128-CBC, AES-192-CBC, AES-256-CBC. Certificate Depth: One. Strict User-CN Matching: check Enforce Match once it is confirmed working. IPv4 Tunnel Network: Set the new VPN network. IPv6 Tunnel Network: leave blank. Redirect Gateway: unchecked.  IPv4 Local network(s): set the local LAN network. IPv6 Local network(s): leave blank. Compression: Enabled with Adaptive Compression. Inter-client communication: Checked. Disable IPv6: Checked. Dynamic IP: Unchecked, at least for now. Topology: subnet. DNS Default Domain: Checked, and set domain. DNS Server enable: Checked. DNS Server 1: enter servers. Save.
+ \item System --> User Manager. Add user for VPN. Certificate: Check to create user certificate. Descriptive name: username.domainname. Certificate Authority: Select internal CA created above. Key length: 4096. Lifetime: 1095.
+ \item VPN --> OpenVPN, Client Export. Remote Access Server: Select the VPN server created earlier. Verify Server CN: automatic. Block Outside DNS: Checked. At the bottom, export as Standard Configurations, Archive to use with another pfSense server. To use with OpenVPN in F-Droid (Android), use Inline Configurations (Android).
+
+
+
  \item Interfaces --> LAN. When you're done using the LAN as any sort of gateway. Change IPv4 Upstream gateway to None. Save. Apply Changes.
  \item Diagnostics --> Backup \& Restore. Backup.
  \item Diagnostics --> Reboot and make sure everything comes up clean.
@@ -142,10 +156,10 @@ forwarding.
 
 
 %Services --> DHCP Server. Note: for netboot install of a workstation. Set up DHCP address. Network Booting, show advanced. Enable network booting for that host. Set Next Server to the IP address of the tftp server. Set XXX to ``jessie_crypto'' for encrypted install or ``jessie'' for a regular install.
-\begin{ennumerate}
+\begin{enumerate}
  \item Services --> DHCP Server. Network Booting, click Display Advanced. Check box for Enables Network Booting. Set Default BIOS file name to jessie\_crypto/pxelinux.0 or jessie/pxelinux.0. Set Next Server to IP address of tftp server. Save.
  \item Services --> DHCP Server. Go to the bottom and hit Add. Add the MAC address, Client Identifier (hostname), IP Address, Hostname, Netboot Filename (we probably don't need it in the general config), and TFTP Server.
-\end{ennumerate}
+\end{enumerate}
 
 \begin{itemize}
  \item Disable IPv6.
