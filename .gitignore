@@ -13,3 +13,6 @@
 *.zip
 *.out
 *.swp
+*.lol
+_minted-*
+
