@@ -44,16 +44,13 @@ These are the the initial configuration steps for a pfSense firewall. Here is an
 
 \begin{enumerate}
  \item Plug the pfSense provided USB cable into the Console port on the firewall and the USB port of your Debian workstation.
- \item Find where the USB device connected, by running this on your Debian workstation:
-\mint{sh}|dmesg -T|
-%\begin{minted}[frame=single]{sh}
-%\end{minted}
+ \item Find where the USB device connected, by running \mintinline{sh}{dmesg -T} on your Debian workstation.
 Look for a line with USB0, USB1, etc. in it, such as:
-\begin{minted}[frame=single]{sh}
+\begin{minted}{sh}
 usb 1-6: cp210x converter now attached to ttyUSB0
 \end{minted}
- \item Run Minicom on your workstation to connect to the router, using the USB device from above.
-\begin{minted}[frame=single]{sh}
+ \item Run \texttt{minicom} on your workstation to connect to the router, using the USB device from above.
+\begin{minted}{sh}
 sudo minicom -D /dev/ttyUSB0
 \end{minted}
 
@@ -160,7 +157,7 @@ OpenVPN is run by a collection of pfSense firewalls.
  \item System --> Cert. Manager. Set up internal certificate authority.
  \item System --> Cert. Manager. Create internal server certificate.
  \item SSH into firewall. pfSense ships with pre-generated DH keys, due to ``heavy computation''. This can take an hour for 4096.
-\begin{minted}[frame=single]{sh}
+\begin{minted}{sh}
 /usr/bin/openssl dhparam 1024 > /etc/dh-parameters.1024
 /usr/bin/openssl dhparam 2048 > /etc/dh-parameters.2048
 /usr/bin/openssl dhparam 4096 > /etc/dh-parameters.4096
@@ -278,7 +275,7 @@ Virtual Private Networks.
 
 pfSense ships with pre-generated DH keys, due to ``heavy computation''.
 This can take an hour for 4096.
-\begin{minted}[frame=single]{sh}
+\begin{minted}{sh}
 /usr/bin/openssl dhparam 1024 > /etc/dh-parameters.1024
 /usr/bin/openssl dhparam 2048 > /etc/dh-parameters.2048
 /usr/bin/openssl dhparam 4096 > /etc/dh-parameters.4096

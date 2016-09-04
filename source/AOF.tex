@@ -39,13 +39,18 @@
 \usetikzlibrary{shapes.geometric}
 
 % Source code highlighting
-%\usepackage{listings} % /usr/share/doc/texlive-doc/latex/listings/listings.pdf
-%\usepackage{listingsutf8}
-\usepackage{minted}	% /usr/share/doc/texlive-doc/latex/minted/minted.pdf
-\usemintedstyle{manni}
-%\usemintedstyle{vs}
-%\usemintedstyle{friendly}
-%\usemintedstyle{colorful}
+\usepackage{mdframed} % /usr/share/doc/texlive-doc/latex/mdframed/mdframed.pdf
+\usepackage{minted}   % /usr/share/doc/texlive-doc/latex/minted/minted.pdf
+\setminted{autogobble, breaklines, breakanywhere, breakautoindent, funcnamehighlighting,style=manni}
+% fontsize
+\setmintedinline{breaklines, breakanywhere}
+\surroundwithmdframed{minted}
+\mdfsetup{roundcorner=10pt,
+linewidth=3pt,
+linecolor=ao-light-blue,
+backgroundcolor=white,
+leftmargin=1cm,rightmargin=1cm
+}
 
 \usepackage{smartdiagram}
 \usesmartdiagramlibrary{additions}
@@ -219,6 +224,12 @@
 \clearpage
 \listoffigures*
 %%% END LIST OF FIGURES %%%
+
+%%% LIST OF LISTINGS %%%
+%\renewcommand*{\lofheadstart}{\vspace{1cm}}
+\clearpage
+\listoflistings
+%%% END LIST OF LISTINGS %%%
 
 %%% CHAPTER STYLE %%%
 \chapterstyle{aofski} % defined in preamble
