@@ -16,7 +16,6 @@
 
 \section{Overview}
 Aleph Objects has recently deployed pfSense firewalls, replacing OpenBSD.
-Most servers and workstations run GNU/Linux, which uses iptables.
 
 \href{https://www.pfsense.org/}{pfSense} --- ``Free, open source customized
 distribution of FreeBSD specifically tailored for use as a firewall and router
@@ -25,13 +24,13 @@ that is entirely managed via web interface.''
 pfSense was selected as Aleph Objects core router/firewall for backbone
 connections.
 
-\section{Initial Configuration Overview}
+\section{Initial Configuration Outline}
 
 These are the the initial configuration steps for a pfSense firewall. Here is an overview of the steps:
 
 \begin{enumerate}
  \item Make serial connection to pfSense firewall, and do basic initial setup.
- \item Connect to pfSense firewall via web browser.
+ \item Connect via ethernet to pfSense firewall with web browser.
  \item Do more initial setup.
  \item Connect pfSense router to Internet.
  \item Update router.
@@ -40,41 +39,326 @@ These are the the initial configuration steps for a pfSense firewall. Here is an
  \item Backup \& reboot.
 \end{enumerate}
 
-\subsection{Setup via Serial Connection}
+
+\subsection{Setup pfSense Hardware}
+The following pfSense hardware has been tested:
+
+\begin{itemize}
+ \item \href{https://store.pfsense.org/SG-2220/}{SG-2220} --- Two 1Gb ethernet ports, dual core 1.7GHz, 2GB RAM, 60GB SSD, single 100-240V power supply, fanless.
+ \item \href{https://store.pfsense.org/SG-2440/}{SG-2440} --- Four 1Gb ethernet ports, dual core 1.7GHz, 4GB RAM, 128GB SSD, single 100-240V power supply, fanless.
+ \item \href{https://store.pfsense.org/SG-4860/}{SG-4860} --- Six 1Gb ethernet ports, quad core 2.4GHz, 8GB RAM, 128GB SSD, single 100-240V power supply, fanless.
+ \item \href{https://store.pfsense.org/XG-2758-HA.aspx}{XG-2758} --- High availability, ten 1Gb ethernet, two 10Gb SFP+ modules, eight core 2.4GHz, 16GB RAM 120GB RAID SSD, single 90~264V power supply, fans, 1U rackmount.
+\end{itemize}
+
+Follow these steps to get the hardware set up to configure the pfSense router.
 
 \begin{enumerate}
+ \item Leave the power off for now.
+ \item Leave the WAN port unplugged for now.
  \item Plug the pfSense provided USB cable into the Console port on the firewall and the USB port of your Debian workstation.
+ \item Plug in the LAN ethernet port into the local LAN switch.
+\end{enumerate}
+
+\subsection{Setup via Serial Connection}
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-console.png}
+ \caption{pfSense Console}
+ \label{fig:pfsense-console}
+\end{figure}
+
+With the hardware all plugged in, connect with minicom and do some initial configuration via the USB port.
+Note, it is possible to start configuration by going to https://192.168.1.1 if you set an IP address on your
+Debian workstation to an address in that subnet. But you won't be able to see all the bootup messages and it
+will make debugging/controlling the router more difficult. With the serial connection, you can see the bootloader etc.
+
+\begin{enumerate}
  \item Find where the USB device connected, by running \mintinline{sh}{dmesg -T} on your Debian workstation.
 Look for a line with USB0, USB1, etc. in it, such as:
 \begin{minted}{sh}
 usb 1-6: cp210x converter now attached to ttyUSB0
 \end{minted}
- \item Run \texttt{minicom} on your workstation to connect to the router, using the USB device from above.
+ \item Run \texttt{minicom} on your Debian workstation to connect to the router, using the USB device from above.
 \begin{minted}{sh}
 sudo minicom -D /dev/ttyUSB0
 \end{minted}
 
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-minicom-settings.png}
+ \caption{pfSense Minicom Settings}
+ \label{fig:pfsense-minicom-settings}
+\end{figure}
+ \item The connection settings are 115200 baud, 8N1, no hardware flow control, no software flow control. Note, hardware flow control is on by default and may prevent you from entering text into the console. To change these settings in minicom, hit \mintinline{sh}{ctrl-a} then the letter \mintinline{sh}{o}. In the menu, with the arrow keys, select \mintinline{sh}{Serial port setup}.
+ \item Plug in power to the pfSense router, and watch it boot up in minicom. It takes 1 minute, 20 seconds for a SG-4860 to cold boot with a default configuration.
+ \item In the pfSense menu, select \texttt{1) Assign Interfaces}.
+%\begin{minted}[fontsize=\footnotesize,highlightcolor=black]{sh}
+\begin{minted}[fontsize=\scriptsize,style=bw]{sh}
+*** Welcome to pfSense 2.3.2-RELEASE (amd64 full-install) on pfSense ***
 
+ WAN (wan)       -> igb1       -> 
+ LAN (lan)       -> igb0       -> v4: 192.168.1.1/24
+ OPT1 (opt1)     -> igb2       -> 
+ OPT2 (opt2)     -> igb3       -> 
+ OPT3 (opt3)     -> igb4       -> 
+ OPT4 (opt4)     -> igb5       -> 
 
- \item 115200 baud, 8N1, no flow control.
+ 0) Logout (SSH only)                  9) pfTop
+ 1) Assign Interfaces                 10) Filter Logs
+ 2) Set interface(s) IP address       11) Restart webConfigurator
+ 3) Reset webConfigurator password    12) PHP shell + pfSense tools
+ 4) Reset to factory defaults         13) Update from console
+ 5) Reboot system                     14) Enable Secure Shell (sshd)
+ 6) Halt system                       15) Restore recent configuration
+ 7) Ping host                         16) Restart PHP-FPM
+ 8) Shell
+  
+Enter an option: 1
+
+Valid interfaces are:
+
+igb0   00:08:a2:00:00:00   (up) Intel(R) PRO/1000 Network Connection, Version - 
+igb1   00:08:a2:00:00:01 (down) Intel(R) PRO/1000 Network Connection, Version - 
+igb2   00:08:a2:00:00:02 (down) Intel(R) PRO/1000 Network Connection, Version - 
+igb3   00:08:a2:00:00:03 (down) Intel(R) PRO/1000 Network Connection, Version - 
+igb4   00:08:a2:00:00:04 (down) Intel(R) PRO/1000 Network Connection, Version - 
+igb5   00:08:a2:00:00:05 (down) Intel(R) PRO/1000 Network Connection, Version - 
+
+Do VLANs need to be set up first?
+If VLANs will not be used, or only for optional interfaces, it is typical to
+say no here and use the webConfigurator to configure VLANs later, if required.
+
+Should VLANs be set up now [y|n]? n
+
+If the names of the interfaces are not known, auto-detection can
+be used instead. To use auto-detection, please disconnect all
+interfaces before pressing 'a' to begin the process.
+
+Enter the WAN interface name or 'a' for auto-detection 
+(igb0 igb1 igb2 igb3 igb4 igb5 or a): igb1
+
+Enter the LAN interface name or 'a' for auto-detection 
+NOTE: this enables full Firewalling/NAT mode.
+(igb0 igb2 igb3 igb4 igb5 a or nothing if finished): igb0
+
+Optional interface 1 description found: OPT1
+Enter the Optional 1 interface name or 'a' for auto-detection
+(igb2 igb3 igb4 igb5 a or nothing if finished): 
+
+The interfaces will be assigned as follows:
+
+WAN  -> igb1
+LAN  -> igb0
+
+Do you want to proceed [y|n]? y
+
+Writing configuration...done.
+One moment while the settings are reloading... done!
+\end{minted}
+
+ \item Note the MAC address for the LAN interface.
  \item Copy MAC address to main DHCP/DNS server, and reserve IP address.
- \item Set IP for LAN (e.g. 192.168.1.1)
- \item Set IP for WAN, disable IPv6
+ \item Set DHCP for WAN, disable IPv6. This is assuming the WAN is on an interface with DHCP (e.g. cable modem). If it is statically set, set
+the address here.
+\begin{minted}[fontsize=\scriptsize,style=bw]{sh}
+Enter an option: 2
+
+Available interfaces:
+
+1 - WAN (igb1 - dhcp, dhcp6)
+2 - LAN (igb0 - static)
+
+Enter the number of the interface you wish to configure: 1
+
+Configure IPv4 address WAN interface via DHCP? (y/n) y
+
+Configure IPv6 address WAN interface via DHCP6? (y/n) n
+
+Enter the new WAN IPv6 address.  Press <ENTER> for none:
+> 
+
+Do you want to revert to HTTP as the webConfigurator protocol? (y/n) n
+
+Please wait while the changes are saved to WAN...
+ Reloading filter...
+ Reloading routing configuration...
+ DHCPD...
+
+The IPv4 WAN address has been set to dhcp
+
+Press <ENTER> to continue.
+\end{minted}
+ \item Set static IP for LAN, using 10.72.9.254/24 as an example. Do not set an IPv6 address. Don't enter a gateway. Don't enable DHCP server (for now, at least).
+\begin{minted}[fontsize=\scriptsize,style=bw]{sh}
+Enter an option: 2
+
+Available interfaces:
+
+1 - WAN (igb1 - dhcp)
+2 - LAN (igb0)
+
+Enter the number of the interface you wish to configure: 2
+
+Enter the new LAN IPv4 address.  Press <ENTER> for none:
+> 10.72.9.254
+
+Subnet masks are entered as bit counts (as in CIDR notation) in pfSense.
+e.g. 255.255.255.0 = 24
+     255.255.0.0   = 16
+     255.0.0.0     = 8
+
+Enter the new LAN IPv4 subnet bit count (1 to 31):
+> 24
+
+For a WAN, enter the new LAN IPv4 upstream gateway address.
+For a LAN, press <ENTER> for none:
+> 
+
+Enter the new LAN IPv6 address.  Press <ENTER> for none:
+> 
+
+Do you want to enable the DHCP server on LAN? (y/n) n
+
+Do you want to revert to HTTP as the webConfigurator protocol? (y/n) n
+
+Please wait while the changes are saved to LAN...
+ Reloading filter...
+ Reloading routing configuration...
+ DHCPD...
+
+The IPv4 LAN address has been set to 10.72.9.254/24
+You can now access the webConfigurator by opening the following URL in your web browser:
+                https://10.72.9.254/
+
+Press <ENTER> to continue.
+\end{minted}
 \end{enumerate}
 
 \subsection{Initial Wizard Setup via Web Browser}
 
 \begin{enumerate}
- \item Log in to firewall (e.g. https://192.168.1.1).
-       Initial pass admin/pfsense.
+ \item If needed, set IP address on Debian workstation that is in the same subnet as new firewall. If you have two ethernet interfaces, and the new firewall is plugged into the second ethernet interface, depending on the interface name, run one of:
+\begin{minted}{sh}
+ifconfig eth0 10.72.9.12
+ifconfig eth1 10.72.9.12
+ifconfig enp3s0 10.72.9.12
+\end{minted}
+
+If you're workstation has only one ethernet connection and the new firewall is plugged into a switch that connects to the workstation, set a second IP address on the primary ethernet interface. It will likely be this:
+\begin{minted}{sh}
+ifconfig eth0:0 10.72.9.12
+\end{minted}
+
+ \item On your Debian workstation, point your browser to the IP address you set on the LAN interface. For example, https://10.72.9.254/
+ \item Your browser will issue a warning about the SSL certificate.
+
+\begin{minted}[fontsize=\scriptsize,style=bw]{sh}
+Your connection is not private
+
+Attackers might be trying to steal your information from 10.72.9.254 (for example, passwords, messages, or credit cards). NET::ERR_CERT_AUTHORITY_INVALID
+\end{minted}
+
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-invalidssl.png}
+ \caption{pfSense Cert Authority Invalid}
+ \label{fig:pfsense-invalidssl}
+\end{figure}
+
+ \item In your browser hit Advanced, which will display this text:
+\begin{minted}[fontsize=\scriptsize,style=bw]{sh}
+This server could not prove that it is 10.72.9.254; its security certificate is not trusted by your computer's operating system. This may be caused by a misconfiguration or an attacker intercepting your connection.
+
+Proceed to 10.72.9.254 (unsafe)
+\end{minted}
+
+ \item Click Proceed to go through with this operation. A new SSL cert will be set up on the firewall in later steps.
+
+ \item Log in to firewall (e.g. https://10.72.9.254). The initial username is admin and the password is pfsense.
+
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-login.png}
+ \caption{pfSense Login}
+ \label{fig:pfsense-login}
+\end{figure}
+
  \item Start Wizard, hit Next.
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-01.png}
+ \caption{pfSense Wizard}
+ \label{fig:pfsense-wizard-01}
+\end{figure}
+
  \item pfSense Gold, Next.
- \item Hostname: set hostname.
- \item Set WAN, LAN, password, etc.
- \item Hit Reload, and the wizard is done.
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-02.png}
+ \caption{pfSense Gold}
+ \label{fig:pfsense-wizard-02}
+\end{figure}
+
+ \item Hostname: set hostname and domain. In this example, fw729 and alephobjects.com. DNS servers can be blank for now.
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-03.png}
+ \caption{pfSense Wizard General Information}
+ \label{fig:pfsense-wizard-03}
+\end{figure}
+
+ \item Time Server Hostname, leave at default. Set timezone to America/Denver.
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-04.png}
+ \caption{pfSense Wizard Timezone}
+ \label{fig:pfsense-wizard-04}
+\end{figure}
+
+ \item Configure WAN interface. Leave the WAN interface ethernet cable unplugged. In later steps, once we get the basic firewalling etc. running, we can plug in WAN and configure it. For now, take the WAN DHCP defaults.
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-05.png}
+ \caption{pfSense Wizard WAN Configuration}
+ \label{fig:pfsense-wizard-05}
+\end{figure}
+
+ \item Configure LAN interface. Set the static IP and netmask, in this example 10.72.9.254 and 24.
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-06.png}
+ \caption{pfSense Wizard LAN Configuration}
+ \label{fig:pfsense-wizard-06}
+\end{figure}
+
+ \item Set Admin WebGUI Password. Choose something unique and following good practices. Use a good password generator.
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-07.png}
+ \caption{pfSense Wizard Admin Password}
+ \label{fig:pfsense-wizard-07}
+\end{figure}
+
+ \item Hit Reload to use the new configuration.
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-08.png}
+ \caption{pfSense Wizard Reload Configuration}
+ \label{fig:pfsense-wizard-08}
+\end{figure}
+
+ \item Watch wizard reload. This should take less than a minute.
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-09.png}
+ \caption{pfSense Wizard Reloading}
+ \label{fig:pfsense-wizard-09}
+\end{figure}
+
+ \item The wizard is now complete. Click \texttt{here} in \texttt{Click here to continue on to pfSense webConfigurator.}
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-10.png}
+ \caption{pfSense Wizard Reloading}
+ \label{fig:pfsense-wizard-10}
+\end{figure}
+
 \end{enumerate}
 
-\subsection{Basic Setup via Web Browser}
+\subsection{Moar Configuration}
+Now that the basic setup of the firewall is done...there is more...
+Upon logging in the first time, you are greeted with a basic Dashboard. Menu items are across the top.
+\begin{figure}[h!]
+\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-dashboard-01.png}
+ \caption{pfSense Initial Dashboard}
+ \label{fig:pfsense-dashboard-01}
+\end{figure}
 
 \begin{enumerate}
  \item System --> User Manager. Click Add. Add Username, Password, Full name, Experation date leave blank. Move to add to Group membership ``admins'' (presuming this is an admin). Add ssh key, if you want to ssh in. Certificate, leave blank for now (can be used for OpenVPN/RADIUS). 
@@ -351,4 +635,5 @@ instance, if a configuration change is made to the DHCP server, it can
  \item MRTG
  \item RRD
 \end{itemize}
+
 
