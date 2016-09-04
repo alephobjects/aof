@@ -26,7 +26,7 @@ that is entirely managed via web interface.''
 pfSense was selected as Aleph Objects core router/firewall for backbone
 connections.
 
-\section{Initial Configuration Outline}
+\section{Initial Configuration}
 
 These are the the initial configuration steps for a pfSense firewall. Here is an overview of the steps:
 
@@ -49,7 +49,7 @@ The following pfSense hardware has been tested:
  \item \href{https://store.pfsense.org/SG-2220/}{SG-2220} --- Two 1Gb ethernet ports, dual core 1.7GHz, 2GB RAM, 60GB SSD, single 100-240V power supply, fanless.
  \item \href{https://store.pfsense.org/SG-2440/}{SG-2440} --- Four 1Gb ethernet ports, dual core 1.7GHz, 4GB RAM, 128GB SSD, single 100-240V power supply, fanless.
  \item \href{https://store.pfsense.org/SG-4860/}{SG-4860} --- Six 1Gb ethernet ports, quad core 2.4GHz, 8GB RAM, 128GB SSD, single 100-240V power supply, fanless.
- \item \href{https://store.pfsense.org/XG-2758-HA.aspx}{XG-2758} --- High availability, ten 1Gb ethernet, two 10Gb SFP+ modules, eight core 2.4GHz, 16GB RAM 120GB RAID SSD, single 90~264V power supply, fans, 1U rackmount.
+ \item \href{https://store.pfsense.org/XG-2758-HA.aspx}{XG-2758} --- High availability, ten 1Gb ethernet, two 10Gb SFP+ modules, eight core 2.4GHz, 16GB RAM 120GB RAID SSD, single 90-264V power supply, fans, 1U rackmount.
 \end{itemize}
 
 Follow these steps to get the hardware set up to configure the pfSense router.
@@ -65,23 +65,24 @@ Follow these steps to get the hardware set up to configure the pfSense router.
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-console.png}
- \caption{pfSense Console}
+ \caption{pfSense Console Using \texttt{minicom}}
  \label{fig:pfsense-console}
 \end{center}
 \end{figure}
 
-With the hardware all plugged in, connect with minicom and do some initial configuration via the USB port.
-Note, it is possible to start configuration by going to https://192.168.1.1 if you set an IP address on your
+With the hardware all plugged in, connect with \texttt{minicom} and do some initial configuration via the USB port.
+Note, it is possible to start configuration by going to \url{https://192.168.1.1} if you set an IP address on your
 Debian workstation to an address in that subnet. But you won't be able to see all the bootup messages and it
 will make debugging/controlling the router more difficult. With the serial connection, you can see the bootloader etc.
 
 \begin{enumerate}
- \item Find where the USB device connected, by running \mintinline{sh}{dmesg -T} on your Debian workstation.
+ \item Find where the USB device connected, by running \texttt{dmesg -T} on your Debian workstation.
 Look for a line with USB0, USB1, etc. in it, such as:
 \begin{minted}{sh}
 usb 1-6: cp210x converter now attached to ttyUSB0
 \end{minted}
  \item Run \texttt{minicom} on your Debian workstation to connect to the router, using the USB device from above.
+ \item Your console should appear similar to figure \ref{fig:pfsense-console}.
 \begin{minted}{sh}
 sudo minicom -D /dev/ttyUSB0
 \end{minted}
@@ -89,15 +90,17 @@ sudo minicom -D /dev/ttyUSB0
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-minicom-settings.png}
- \caption{pfSense Minicom Settings}
+ \caption{pfSense \texttt{minicom} Settings}
  \label{fig:pfsense-minicom-settings}
 \end{center}
 \end{figure}
- \item The connection settings are 115200 baud, 8N1, no hardware flow control, no software flow control. Note, hardware flow control is on by default and may prevent you from entering text into the console. To change these settings in minicom, hit \mintinline{sh}{ctrl-a} then the letter \mintinline{sh}{o}. In the menu, with the arrow keys, select \mintinline{sh}{Serial port setup}.
- \item Plug in power to the pfSense router, and watch it boot up in minicom. It takes 1 minute, 20 seconds for a SG-4860 to cold boot with a default configuration.
- \item In the pfSense menu, select \texttt{1) Assign Interfaces}.
-%\begin{minted}[fontsize=\footnotesize,highlightcolor=black]{sh}
-\begin{minted}[fontsize=\scriptsize,style=bw]{sh}
+ \item The connection settings are \texttt{115200 bps}, \texttt{8N1}, no \texttt{Hardware Flow Control}, no \texttt{Software Flow Control}. Note, \texttt{Hardware Flow Control} is on by default and may prevent you from entering text into the console.
+ \item To change these settings in \texttt{minicom}, hit \texttt{ctrl-a} then the letter \texttt{o}.
+ \item In the menu, with the arrow keys, select \texttt{Serial port setup}.
+ \item Set the values listed in figure \ref{fig:pfsense-minicom-settings}.
+ \item Plug in power to the pfSense router, and watch it boot up in \texttt{minicom}. It takes 1 minute, 20 seconds for a pfSense model SG-4860 firewall to cold boot with a default configuration.
+ \item In the pfSense menu, select \texttt{1) Assign Interfaces}. See console listing below.
+\begin{minted}[style=bw]{sh}
 *** Welcome to pfSense 2.3.2-RELEASE (amd64 full-install) on pfSense ***
 
  WAN (wan)       -> igb1       -> 
@@ -164,6 +167,8 @@ One moment while the settings are reloading... done!
  \item Copy MAC address to main DHCP/DNS server, and reserve IP address.
  \item Set DHCP for WAN, disable IPv6. This is assuming the WAN is on an interface with DHCP (e.g. cable modem). If it is statically set, set
 the address here.
+ \item In the pfSense menu, select \texttt{2) Set interface(s) IP address}, then \texttt{1} to select the WAN interface. See console listing below.
+
 \begin{minted}[fontsize=\scriptsize,style=bw]{sh}
 Enter an option: 2
 
@@ -192,7 +197,9 @@ The IPv4 WAN address has been set to dhcp
 
 Press <ENTER> to continue.
 \end{minted}
- \item Set static IP for LAN, using 10.72.9.254/24 as an example. Do not set an IPv6 address. Don't enter a gateway. Don't enable DHCP server (for now, at least).
+
+ \item Set static IP for LAN, using \texttt{10.72.9.254/24} as an example. Do not set an IPv6 address. Don't enter a gateway. Don't enable DHCP server (for now, at least).
+ \item In the pfSense menu, select \texttt{2) Set interface(s) IP address}, then \texttt{2} to select the LAN interface. See console listing below.
 \begin{minted}[fontsize=\scriptsize,style=bw]{sh}
 Enter an option: 2
 
@@ -253,8 +260,8 @@ If you're workstation has only one ethernet connection and the new firewall is p
 ifconfig eth0:0 10.72.9.12
 \end{minted}
 
- \item On your Debian workstation, point your browser to the IP address you set on the LAN interface. For example, https://10.72.9.254/
- \item Your browser will issue a warning about the SSL certificate.
+ \item On your Debian workstation, point your browser to the IP address you set on the LAN interface. For example, \url{https://10.72.9.254/}
+ \item Your browser will issue a warning about the SSL certificate. Don't send to Google...
 
 \begin{minted}[fontsize=\scriptsize,style=bw]{sh}
 Your connection is not private
@@ -270,16 +277,16 @@ Attackers might be trying to steal your information from 10.72.9.254 (for exampl
 \end{center}
 \end{figure}
 
- \item In your browser hit Advanced, which will display this text:
+ \item In your browser hit \texttt{Advanced}, which will display this text (see also figure \ref{fig:pfsense-invalidssl}:
 \begin{minted}[fontsize=\scriptsize,style=bw]{sh}
 This server could not prove that it is 10.72.9.254; its security certificate is not trusted by your computer's operating system. This may be caused by a misconfiguration or an attacker intercepting your connection.
 
 Proceed to 10.72.9.254 (unsafe)
 \end{minted}
 
- \item Click Proceed to go through with this operation. A new SSL cert will be set up on the firewall in later steps.
+ \item Click \texttt{Proceed} to go through with this operation. A new SSL cert will be set up on the firewall in later steps to replace this self-signed certificate.
 
- \item Log in to firewall (e.g. https://10.72.9.254). The initial username is admin and the password is pfsense.
+ \item Log in to firewall (e.g. \url{https://10.72.9.254}). The initial username is \texttt{admin} and the password is \texttt{pfsense}, as seen in figure \ref{fig:pfsense-long}.
 
 \begin{figure}[h!]
 \begin{center}
@@ -289,7 +296,8 @@ Proceed to 10.72.9.254 (unsafe)
 \end{center}
 \end{figure}
 
- \item Start Wizard, hit Next.
+ \item Start Wizard (figure \ref{fig:pfsense-wizard-01}), hit \texttt{Next}.
+
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-01.png}
@@ -298,7 +306,8 @@ Proceed to 10.72.9.254 (unsafe)
 \end{center}
 \end{figure}
 
- \item pfSense Gold, Next.
+ \item pfSense Gold plea, see (figure \ref{fig:pfsense-wizard-02}), hit \texttt{Next}.
+
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-02.png}
@@ -307,7 +316,6 @@ Proceed to 10.72.9.254 (unsafe)
 \end{center}
 \end{figure}
 
- \item Hostname: set hostname and domain. In this example, fw729 and alephobjects.com. DNS servers can be blank for now.
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-03.png}
@@ -316,7 +324,13 @@ Proceed to 10.72.9.254 (unsafe)
 \end{center}
 \end{figure}
 
- \item Time Server Hostname, leave at default. Set timezone to America/Denver.
+ \item This is the \texttt{General Information} page of the wizard, see figure \ref{fig:pfsense-wizard-03}.
+ \item Set \texttt{Hostname}, in this example \texttt{fw729}. Select a different hostname than \texttt{fw729}.
+ \item Set \texttt{Domain}, in this example \texttt{alephobjects.com}.
+ \item \texttt{Primary DNS Server} and \texttt{Secondary DNS Server} can be blank for now. They will be set it later steps.
+ \item \texttt{Override DNS}, leave checked.
+ \item Hit \texttt{Next} to save.
+
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-04.png}
@@ -325,7 +339,11 @@ Proceed to 10.72.9.254 (unsafe)
 \end{center}
 \end{figure}
 
- \item Configure WAN interface. Leave the WAN interface ethernet cable unplugged. In later steps, once we get the basic firewalling etc. running, we can plug in WAN and configure it. For now, take the WAN DHCP defaults.
+ \item The \texttt{Time Server Information} page of the wizard, see figure \ref{fig:pfsense-wizard-04}.
+ \item \texttt{Time Server Hostname}, leave at default.
+ \item Set \texttt{Timezone} to \texttt{America/Denver}.
+ \item Hit \texttt{Next} to save.
+
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-05.png}
@@ -334,7 +352,17 @@ Proceed to 10.72.9.254 (unsafe)
 \end{center}
 \end{figure}
 
- \item Configure LAN interface. Set the static IP and netmask, in this example 10.72.9.254 and 24.
+ \item The \texttt{Configure WAN Interface} page of the wizard, see figure \ref{fig:pfsense-wizard-05}.
+ \item Configure WAN interface. Leave the WAN interface ethernet cable unplugged. In later steps, once we get the basic firewalling etc. running, we can plug in WAN and configure it. For now, take the WAN DHCP defaults.
+ \item See figure \ref{fig:pfsense-wizard-05}.
+ \item \texttt{Selected type} use \texttt{DHCP}.
+ \item \texttt{MAC Address}, leave blank.
+ \item \texttt{MTU}, leave blank.
+ \item \texttt{MSS}, leave blank.
+ \item \texttt{MAC Address}, leave blank.
+ \item Hit \texttt{Next} to save.
+
+ \item Configure LAN interface.
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-06.png}
@@ -343,7 +371,13 @@ Proceed to 10.72.9.254 (unsafe)
 \end{center}
 \end{figure}
 
- \item Set Admin WebGUI Password. Choose something unique and following good practices. Use a good password generator.
+ \item The \texttt{Configure LAN Interface} page of the wizard, see figure \ref{fig:pfsense-wizard-06}.
+ \item \texttt{LAN IP Address}, set the static IP. In this example \texttt{10.72.9.254}.
+ \item \texttt{Subnet Mask}, set to \texttt{24}, which is \texttt{255.255.255.0}.
+ \item Hit \texttt{Next} to save.
+
+ \item \texttt{Set Admin WebGUI Password}, see figure \ref{fig:pfsense-wizard-07}.
+ \item Choose something unique and following good practices. Use a good password generator.
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-07.png}
@@ -351,8 +385,9 @@ Proceed to 10.72.9.254 (unsafe)
  \label{fig:pfsense-wizard-07}
 \end{center}
 \end{figure}
+ \item Hit \texttt{Next} to save.
 
- \item Hit Reload to use the new configuration.
+ \item Hit \texttt{Reload} to use the new configuration.
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-08.png}
@@ -381,9 +416,7 @@ Proceed to 10.72.9.254 (unsafe)
 
 \end{enumerate}
 
-\subsection{Moar Configuration}
-Now that the basic setup of the firewall is done...there is more...
-Upon logging in the first time, you are greeted with a basic Dashboard. Menu items are across the top.
+\subsection{Initial Dashboard}
 \begin{figure}[h!]
 \begin{center}
 \includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-dashboard-01.png}
@@ -392,6 +425,12 @@ Upon logging in the first time, you are greeted with a basic Dashboard. Menu ite
 \end{center}
 \end{figure}
 
+The main dashboard gives an overview of the system. It will be configured more in later steps.
+
+
+\subsection{Moar Configuration}
+Now that the basic setup of the firewall is done...there is more...
+Upon logging in the first time, you are greeted with a basic Dashboard. Menu items are across the top.
 
 \subsection{Set Up a New User}
 %\begin{figure}[h!]
@@ -411,6 +450,7 @@ Upon logging in the first time, you are greeted with a basic Dashboard. Menu ite
  \label{fig:pfsense-system-user-users}
 \end{center}
 \end{figure}
+
  \item Click Add.
 
 \begin{figure}[h!]
@@ -421,67 +461,285 @@ Upon logging in the first time, you are greeted with a basic Dashboard. Menu ite
 \end{center}
 \end{figure}
 
- \item Add Username, jebba in this example.
+ \item Add \texttt{Username}, \texttt{jebba} in this example--use something else.
  \item Add a good, well-generated unique password.
- \item Full name.
- \item Experation date leave blank.
- \item Move to add to Group membership ``admins''.
- \item Certificate, leave blank for now (one will be set up later with OpenVPN).
- \item Add ssh key, if you want to ssh in.
- \item Hit Save.
+ \item Enter the user's \texttt{Full name}.
+ \item \texttt{Expiration date} leave blank.
+ \item Move to add to \texttt{Group membership} \texttt{admins}.
+ \item \texttt{Certificate}, leave blank for now (one will be set up later with OpenVPN).
+ \item For \texttt{Authorized SSH Keys}, add your SSH key from your Debian workstation. It will be either \texttt{/home/aleph/.ssh/id\_ed25519.pub} or for older keys \texttt{/home/aleph/.ssh/id\_rsa.pub}. Be sure the file ends in \texttt{.pub} and isn't the private key. You can use multiple keys, one per line.
+ \item Hit \texttt{Save}.
  \item Log out as the admin user by clicking the logout icon in the upper right corner of the pfSense web page.
- \item Log back in as the newly created user in the above steps.
-
-\subsection{Advanced System Configuration}
- \item Goto System --> Advanced. Under Admin Access. Set TCP port to randomish port between 1 and 65535. This will be the new pfSense web interface port address. Max processes: 16 (2 is too low, not sure what is ideal). Check WebGUI redirect to disable port 80. Check enable Secure Shell Server. Disable password login. Pick randomish port for SSH. Check to password protect Console menu. Save.
- \item At this point, you can optionally SSH into the firewall if a key was set up for the user.
- \item Under System --> Advanced, Networking. Uncheck Allow IPv6, to disable IPv6 (yay!). Check boxes for: Hardware Checksum Offloading, Hardware TCP Segmentation Offloading, Hardware Large Receive Offloading. These need to be disabled because/if Suricata is used in Inline mode. If it isn't, these can be unchecked and if the hardware is good/can handle it, it will likely be faster. (Side note, enabling Hardware Checksum Offloading breaks networking in a KVM.) Save.
- \item System --> Advanced, Miscellaneous. Cryptographic Hardware should be set to AES-NI for any hardware from pfSense. For other hardware, check dmesg. Thermal Sensors: Intel Core* CPU on-die thermal sensor. Hard disk standby time, 6 minutes (not sure this really has any effect). Host UUID, check Do NOT send HOST UUID with user agent. Save.
- \item System --> Notifications. Check for Disable Growl Notifications and Disable SMTP. Save.
+ \item Log back in as the newly created user and password in the above steps.
 \end{enumerate}
 
-\subsection{SSL Certificate Manager Setup}
+\subsection{SSH Access}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-term-top.png}
+ \caption{pfSense Via SSH, Running \texttt{top}}
+ \label{fig:pfsense-term-top}
+\end{center}
+\end{figure}
+At this point, enough is set up in the router to allow for remote SSH access.
+Log in, like in this example, where the port is \texttt{2222}, the user is \texttt{jebba}, and the IP address of the firewall is \texttt{10.72.9.254}.
+Side note: the FreeBSD shell displays better on a black terminal than a white one.
+
+\begin{minted}{sh}
+ssh -p 2222 jebba@10.72.9.254
+\end{minted}
+
+Some example commands to run:
+\begin{minted}{sh}
+top # use q to exit
+dmesg
+df -h
+ps ax
+ifconfig
+ping -c 1 10.72.9.254
+route -n show 0.0.0.0 # Will give error if no gateway is set
+# etc...
+\end{minted}
+
+
+\subsection{Admin Access Configuration}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-system-adv-access.png}
+ \caption{pfSense Menu: System, Advanced, Admin Access}
+ \label{fig:pfsense-system-adv-access}
+\end{center}
+\end{figure}
 \begin{enumerate}
- \item System --> Cert. Manager. Under Certificates, click Add. Method: Create a Certificate Signing Request. Descriptive Name, use the hostname of the firewall being setup. Key length 4096, Digest Algorithm sha512. Country Code US, etc. Common name, use hostname of firewall. Save.
- \item System --> Cert. Manager, Under Certificates, the new cert added above, click Export Request mini-icon. Gandi: Standard SSL, single address, 3 year. Paste in the CSR exported from the mini-icon into Gandi. Select Apache/ModSSL for Software used in Gandi, and if it says the correct ``Main domain (CN)'', hit Submit in Gandi. Delete any .req file that was downloaded by browser. Gandi: Validation by email (probably). It will take ~10+ minutes to get verification back from Gandi (not instant).
- \item System --> Cert. Manager, Under Certificates. When cert is ready and confirmed at Gandi, hit Get the Certificate. Hit the ``Update CSR'' pencil on the appropriate certificate line. Paste the Gandi cert into Final certificate data. Delete any downloaded copies.
- \item System --> Cert. Manager. Under CAs, click Add. Method: Import an existing Certificate Authority. Descriptive Name: ``GandiStandardSSLCA2''. Get the cert from \url{https://www.gandi.net/static/CAs/GandiStandardSSLCA2.pem} and paste into Certificate data. Certificate Private Key, blank. Save. Note, this has to be done after the above Gandi certificate is added to the firewall.
- \item System --> Cert. Manager, also import any of our own CAs and Certificate Revocations, if any.
+ \item Goto \texttt{System} --> \texttt{Advanced}, \texttt{Admin Access} tab.
+ \item Leave \texttt{Protocol} at \texttt{HTTPS}.
+ \item Set \texttt{TCP port} to randomish port between \texttt{1} and \texttt{65535}. This will be the new pfSense web interface port address.
+ \item Set \texttt{Max Processes}: 16 (2 is too low, not sure what is ideal).
+ \item Check \texttt{WebGUI redirect} to disable port 80.
+ 
+ \item Leave \texttt{WebGUI Login Autocomplete} unchecked.
+ \item Leave \texttt{WebGUI login messages} unchecked.
+ \item Leave \texttt{Anti-lockout} unchecked.
+ \item Leave \texttt{DNS Rebind Check} unchecked.
+ \item Leave \texttt{Alternate Hostnames} blank. If there are known other names for the firewall, they can be entered here.
+ \item Leave \texttt{Browser HTTP\_REFERER enforcement} unchecked.
+ \item Leave \texttt{Browser tab text} unchecked.
+ \item Check \texttt{Secure Shell Server} to enable SSH.
+ \item Check \texttt{Authentication Method} to disable password logins.
+ \item Set \texttt{SSH Port} to a new randomish port btween \texttt{1} and \texttt{65535}.
+ \item Leave \texttt{Serial Speed} at \texttt{115200}.
+ \item Check \texttt{Console menu} to password protect the serial console menu.
+ \item Hit \texttt{Save}.
+ \item If a new port was set, the browser will redirect to it after a few seconds, for example to \url{https://10.72.9.254:9443/system_advanced_admin.php}
+ \item At this point, you can optionally SSH into the firewall, if a key was set up for the user.
+\end{enumerate}
+
+\subsection{Advanced Networking Configuration}
+Note, the \texttt{System} --> \texttt{Advanced}, \texttt{Firewall \& NAT} section can be left at defaults.
+
+\begin{enumerate}
+ \item Under \texttt{System} --> \texttt{Advanced}, \texttt{Networking} tab.
+ \item Uncheck \texttt{Allow IPv6}, to disable IPv6 (yay!).
+ \item Check to disable \texttt{Hardware Checksum Offloading}. This needs to be disabled for Suricata inline mode. This needs to be disabled when running pfSense inside a virtual KVM, or you'll get TCP/IP checksum errors.
+ \item Check to disable \texttt{Hardware TCP Segmentation Offloading}. This needs to be disabled for Suricata inline mode.
+ \item Check to disable \texttt{Hardware Large Receive Offloading}. This needs to be disabled for Suricata inline mode.
+ \item Hit \texttt{Save}.
+\end{enumerate}
+
+\subsection{Advanced Miscellaneous Configuration}
+\begin{enumerate}
+ \item \texttt{System} --> \texttt{Advanced}, \texttt{Miscellaneous}.
+ \item \texttt{Cryptographic Hardware} should be set to \texttt{AES-NI} for any hardware from pfSense. For other hardware, check dmesg.
+ \item \texttt{Thermal Sensors}: use \texttt{Intel Core* CPU on-die thermal sensor}.
+ \item \texttt{Hard disk standby time}, set to \texttt{6 minutes} (not sure this really has any effect).
+ \item \texttt{Host UUID}, check \texttt{Do NOT send HOST UUID with user agent}.
+ \item Hit \texttt{Save}.
+\end{enumerate}
+
+\subsection{Advanced Notifications Configuration}
+\begin{enumerate}
+ \item \texttt{System} --> \texttt{Advanced}, \texttt{Notifications}.
+ \item Check to \texttt{Disable Growl Notifications}
+ \item Check to \texttt{Disable SMTP}.
+ \item Hit \texttt{Save}.
+\end{enumerate}
+
+\subsection{SSL Create a Certificate Signing Request}
+A new SSL certificate will be created in the following steps. This certificate will then be used to
+encrypt web administration sessions (\texttt{https}).
+
+\begin{enumerate}
+ \item \texttt{System} --> \texttt{Cert. Manager}, \texttt{Certificates}.
+ \item Click \texttt{Add}.
+ \item \texttt{Method}: \texttt{Create a Certificate Signing Request}.
+ \item \texttt{Descriptive Name}, use the hostname of the firewall being setup.
+ \item \texttt{Key length}: \texttt{4096}. That may be overkill, but it is just used for the CSR so it doesn't matter.
+ \item \texttt{Digest Algorithm}: \texttt{sha512}.
+ \item \texttt{Country Code}: \texttt{US}.
+ \item \texttt{State}: \texttt{Colorado}. % XXX I think this has a different name. Region?
+ \item \texttt{City}: \texttt{Loveland}.
+ \item \texttt{Common name}, use hostname of firewall.
+ \item Hit \texttt{Save}.
+\end{enumerate}
+
+\subsection{SSL Retrieve and Submit a Certificate Signing Request}
+\begin{enumerate}
+ \item \texttt{System} --> \texttt{Cert. Manager}, \texttt{Certificates}.
+ \item For the new cert added above, click \texttt{Export Request} mini-icon.
+ \item Go to the SSL provider, such as \url{https://gandi.net}.
+ \item Gandi: \texttt{Standard SSL}, single address, 3 year.
+ \item Paste in the CSR exported from the mini-icon into Gandi.
+ \item Select \texttt{Apache/ModSSL} for \texttt{Software} used in Gandi, 
+ \item If it says the correct \texttt{Main domain (CN)}, hit \texttt{Submit} in Gandi.
+ \item Delete any temporary \texttt{*.req} file that was downloaded by browser.
+ \item Gandi: \texttt{Validation by email} (probably). It will take ~10+ minutes to get verification back from Gandi (not instant).
+ \item When verification email arrives, go to the URL provided and enter the provided random string.
+ \item It takes around 5 minutes for the confirmation to be pushed back to Gandi and make the certificate valid. Wait.
+\end{enumerate}
+
+\subsection{SSL Install New Certificate}
+\begin{enumerate}
+ \item \texttt{System} --> \texttt{Cert. Manager}, \texttt{Certificates}.
+ \item When cert is ready and confirmed at Gandi, hit \texttt{Get the Certificate}.
+ \item Hit the \texttt{Update CSR} pencil on the appropriate certificate line.
+ \item In the Gandi popup window, copy the certificate data.
+ \item In the pfSense window, paste the Gandi cert into the \texttt{Final certificate data} field.
+ \item Delete any downloaded copies.
+\end{enumerate}
+
+\subsection{SSL Import Gandi Certificate Authority}
+Note, this has to be done after the above Gandi certificate is added to the firewall.
+
+XXX Note, we could also import AO's key here.
+
+\begin{enumerate}
+ \item \texttt{System} --> \texttt{Cert. Manager}, \texttt{CAs}.
+ \item Under \texttt{CAs}, click \texttt{Add}.
+ \item \texttt{Method}: \texttt{Import an existing Certificate Authority}.
+ \item \texttt{Descriptive Name}: \texttt{GandiStandardSSLCA2}.
+ \item Download the cert from \url{https://www.gandi.net/static/CAs/GandiStandardSSLCA2.pem}
+ \item Paste downloaded Gandi certificate into \texttt{Certificate data}.
+ \item Leave \texttt{Certificate Private Key} blank.
+ \item Hit \texttt{Save}.
+\end{enumerate}
+
+\subsection{SSL Certificate Revocations}
+Note, this has to be done after the above Gandi certificate is added to the firewall.
+
+\begin{enumerate}
+ \item \texttt{System} --> \texttt{Cert. Manager}, \texttt{Certificate Revocations}.
+ \item Import \texttt{Certificate Revocations}, if any.
 \end{enumerate}
 
 \subsection{General Setup}
 \begin{enumerate}
- \item System --> General Setup. Check all looks good. Top Navigation: Fixed (Remains visible at top of page). Hostname in Menu: Hostname only. (DNS servers can be bound to particular interfaces here, if needed in multi-WAN). Save.
- \item To use the newly set up certifcate. System --> Advanced, Admin Acess. Change SSL Certificate to the new one. Save. Now go to that new hostname with https and the correct port.
+ \item \texttt{System} --> \texttt{General Setup}.
+ \item Leave most at defaults.
+ \item \texttt{Top Navigation}: \texttt{Fixed (Remains visible at top of page)}.
+ \item \texttt{Hostname in Menu}: \texttt{Hostname only}.
+ \item \texttt{DNS servers} can be bound to particular interfaces here, if needed in multi-WAN (later configuration).
+ \item \texttt{Dashboard Columns} set to \texttt{4}.
+ \item Hit \texttt{Save}.
+\end{enumerate}
+
+\subsection{Use New SSL Certificate for Web Admin}
+A new SSL certificate was created above. This can now be used by the firewall to encrypt web administration sessions.
+
+\begin{enumerate}
+ \item \texttt{System} --> \texttt{Advanced}, \texttt{Admin Access}.
+ \item Change \texttt{SSL Certificate} to the new one created above.
+ \item Hit \texttt{Save}.
+ \item Now go to that new hostname with https and the correct port, such as \url{https://10.72.9.254:9443/}.
 \end{enumerate}
 
 \subsection{Initial Firewall Rules}
+Some basic firewall rules will be set up now, before the WAN interface is enabled.
+For now, IPv6 will be rejected on the LAN interface and blocked on the WAN interface.
+
 \begin{enumerate}
- \item Firewall --> Rules. LAN interface, click the pencil to edit the IPv6 line. Change Action to Reject. Change Source to any. Change Description to ``Default Reject LAN IPv6''. Save. Apply Changes.
- \item Firewall --> Rules. Under LAN interface, click the Copy mini-icon to copy the IPv6 line. Change Action to Block. Interface to WAN. Change Description to ``Default Block WAN IPv6''. Save. Apply Changes.
+ \item \texttt{Firewall} --> \texttt{Rules}, \texttt{LAN}.
+ \item \texttt{LAN} interface, click the pencil to edit the \texttt{IPv6} line.
+ \item Change \texttt{Action} to \texttt{Reject}.
+ \item Change \texttt{Source} to \texttt{any}.
+ \item Change \texttt{Description} to \texttt{Default Reject LAN IPv6}.
+ \item Hit \texttt{Save}.
+ \item Hit \texttt{Apply Changes}.
+ \item \texttt{Firewall} --> \texttt{Rules}, \texttt{LAN}.
+ \item Click the \texttt{Copy} mini-icon to copy the newly modified \texttt{IPv6} line.
+ \item Change \texttt{Action} to \texttt{Block}.
+ \item Change \texttt{Interface} to \texttt{WAN}.
+ \item Change \texttt{Description} to \texttt{Default Block WAN IPv6}.
+ \item Hit \texttt{Save}.
+ \item Hit \texttt{Apply Changes}.
 \end{enumerate}
 
 \subsection{Initial DNS Resolver Setup}
 \begin{enumerate}
- \item Services --> DNS Resolver. Enable (default). Network Interfaces: just select LAN and localhost. Outgoing Network Interfaces: WAN, LAN, localhost. Add checks for DHCP Registration, Static DHCP. Save. Apply Changes.
- \item Services --> DNS Resolver, Advanced Settings. Add checks for: Prefetch Support, Prefetch DNS Key Support. Increase Message Cache Size to 50 MB or so (?). Save. Apply Changes.
- \item Services --> Dynamic DNS. Setup, if needed.
+ \item \texttt{Services} --> \texttt{DNS Resolver}.
+ \item Check \texttt{Enable} (default).
+ \item \texttt{Network Interfaces}: select \texttt{LAN} and \texttt{localhost}.
+ \item \texttt{Outgoing Network Interfaces}: select \texttt{WAN}, \texttt{LAN}, \texttt{localhost}.
+ \item Check \texttt{DHCP Registration}
+ \item Check \texttt{Static DHCP}
+ \item Hit \texttt{Save}.
+ \item Hit \texttt{Apply Changes}.
+ \item \texttt{Services} --> \texttt{DNS Resolver}, \texttt{Advanced Settings}.
+ \item Check \texttt{Prefetch Support}.
+ \item Check \texttt{Prefetch DNS Key Support}.
+ \item Increase \texttt{Message Cache Size} to \texttt{50 MB} or so (?).
+ \item Hit \texttt{Save}.
+ \item Hit \texttt{Apply Changes}.
+\end{enumerate}
+
+\subsection{Dynamic DNS Setup}
+If dynamic DNS is to be set up, follow these steps... XXX
+\begin{enumerate}
+ \item \texttt{Services} --> \texttt{Dynamic DNS}.
 \end{enumerate}
 
 \subsection{Initial Logging Setup}
 Setup logging to the local firewall. Remote logging will be set up.
 
 \begin{enumerate}
- \item Status --> System Logs, Settings. Add checks to Forward/Reverse Display. GUI Log Entries, increase to 200. Where to show rule descriptions ``Display as second row''. This is where remote logging will be set up... 
- \item Status --> Dashboard. Click the Plus + in the upper right corner. Add the available widgets: Gateways, Thermal Sensors, Traffic Graphs, S.M.A.R.T. Status, Firewall Logs, Interface Statistics, OpenVPN, Services Status, NTP Status.
+ \item \texttt{Status} --> \texttt{System Logs}, \texttt{Settings}.
+ \item Check \texttt{Forward/Reverse Display}.
+ \item Increase \texttt{GUI Log Entries} to \texttt{200}.
+ \item Set \texttt{Where to show rule descriptions} to \texttt{Display as second row}.
+ \item Note, XXX this is where remote logging will be set up... 
+ \item Hit \texttt{Save}.
+\end{enumerate}
+
+\subsection{Initial Dashboard Setup}
+
+\begin{enumerate}
+ \item \texttt{Status} --> \texttt{Dashboard}.
+ \item Click the Plus \texttt{+} in the upper right corner.
+ \item Add \texttt{Firewall Logs}.
+ \item Add \texttt{Gateways}.
+ \item Add \texttt{Interface Statistics}.
+ \item Add \texttt{NTP Status}.
+ \item Add \texttt{OpenVPN}.
+ \item Add \texttt{Services Status}.
+ \item Add \texttt{S.M.A.R.T. Status}.
+ \item Add \texttt{Thermal Sensors}.
+ \item Add \texttt{Traffic Graphs}.
+ \item Click the mini-disk icon in the upper right to save the dashboard configuration.
 \end{enumerate}
 
 \subsection{Backup}
 Make first backup.
 
 \begin{enumerate}
- \item Diagnostics --> Backup \& Restore. Backup.
- \item Diagnostics --> Reboot and make sure everything comes up clean.
+ \item \texttt{Diagnostics} --> \texttt{Backup \& Restore}, \texttt{Backup}.
+ \item Make a backup and store in the proper location.
+\end{enumerate}
+
+\subsection{Reboot}
+Now that most of the ``initial'' setup has been done, reboot to make sure everything comes up clean.
+It takes less than two minutes to reboot. XXX times.
+
+\begin{enumerate}
+ \item \texttt{Diagnostics} --> \texttt{Reboot}
 \end{enumerate}
 
 \subsection{Internet Connection}
@@ -491,50 +749,142 @@ Make initial connection to the Internet with the new pfSense firewall.
 At this point, this presumes the WAN interface isn't up and routing actual Internet traffic. It is better to get the router as configured as possible before actually using the WAN interface. Assuming the firewall is on the LAN and being configured, it can use the gateway that is on its LAN interface. When configuration is finalized and the router is deployed, the WAN interface will carry Internet traffic. To to this, add a route by: Interfaces --> LAN. Under IPv4 Upstream gateway, click Add a new gateway. Add the LAN gateway info, and check is as Default gateway (3000). Save. Apply Changes..
 
 \begin{enumerate}
- \item System --> Routing. Click to edit the mini pencil icon on the Gateway line listed as Default. Monitor IP: something appropriate upstream, can use 8.8.8.8. Note: on high latency connections such as satellite, hit Display Advanced and increase Latency thresholds (750, 2500), Packet Loss thresholds (15, 25), Probe Interval (1000), Loss Interval (3000). Save. Apply Changes.
+ \item \texttt{System} --> \texttt{Routing}
+ \item Click to \texttt{Edit} the mini pencil icon on the \texttt{Gateway} line listed as \texttt{Default}.
+ \item \texttt{Monitor IP}: something appropriate upstream, can use \texttt{8.8.8.8}.
+ \item Note: on high latency connections such as satellite, hit \texttt{Display Advanced} and increase \texttt{Latency thresholds} (default: 750, new: 2500), \texttt{Packet Loss thresholds} (15, 25), \texttt{Probe Interval} (1000), \texttt{Loss Interval} (3000).
+ \item Hit \texttt{Save}.
+ \item Hit \texttt{Apply Changes}.
 \end{enumerate}
 
 \subsection{Update \& Install Packages}
 \begin{enumerate}
- \item System --> Update, System Update. Check that the Status is ``Up to date.'' If it needs updating, update.
- \item System --> Package Manager, Installed Packages. The first time here, you need to click on Available Packages (presumably to download latest package header info). Then go back to Installed Packages. If there are any Installed Packages that have a Newer version available, click the mini icon to update the package. Confirm.
- \item System --> Package Manager, Available Packages. Install: Cron, ntopng, openvpn-client-export, pfBlockerNG, RRD\_Summary, Status\_Traffic\_Totals, sudo, suricata.
- \item System --> sudo. Add user, optionally.
+ \item \texttt{System} --> \texttt{Update}, \texttt{System Update}.
+ \item Check that the \texttt{Status} is \texttt{Up to date}. If it needs updating, hit \texttt{Update}.
+ \item \texttt{System} --> \texttt{Package Manager}, \texttt{Installed Packages}.
+ \item The first time here, you need to click on \texttt{Available Packages}
+ \item Wait to download latest package header info.
+ \item Then go back to \texttt{System} --> \texttt{Package Manager}, \texttt{Installed Packages}.
+ \item If there are any \texttt{Installed Packages} that have a \texttt{Newer version available}, click the mini icon to \texttt{Update} the package. Then \texttt{Confirm}.
+ \item Go to \texttt{System} --> \texttt{Package Manager}, \texttt{Available Packages} and install the following packages:
+ \item \texttt{Cron}.
+ \item \texttt{ntopng}.
+ \item \texttt{openvpn-client-export}.
+ \item \texttt{pfBlockerNG}.
+ \item \texttt{RRD\_Summary}.
+ \item \texttt{Status\_Traffic\_Totals}.
+ \item \texttt{sudo}.
+ \item \texttt{suricata}.
 \end{enumerate}
 
+\subsection{Set Up \texttt{sudo} User}
+\begin{enumerate}
+ \item \texttt{System} --> \texttt{sudo}
+ \item Add the user added above to sudo.
+\end{enumerate}
 
-\subsection{OpenVPN}
-OpenVPN is run by a collection of pfSense firewalls.
+\subsection{OpenVPN Certificates}
+OpenVPN certificates need to be created before OpenVPN can be set up.
+Also, new DH random seeds are generated.
 
 \begin{enumerate}
- \item OpenVPN setup.
- \item System --> Cert. Manager. Set up internal certificate authority.
- \item System --> Cert. Manager. Create internal server certificate.
  \item SSH into firewall. pfSense ships with pre-generated DH keys, due to ``heavy computation''. This can take an hour for 4096.
 \begin{minted}{sh}
 /usr/bin/openssl dhparam 1024 > /etc/dh-parameters.1024
 /usr/bin/openssl dhparam 2048 > /etc/dh-parameters.2048
 /usr/bin/openssl dhparam 4096 > /etc/dh-parameters.4096
 \end{minted}
- \item VPN --> OpenVPN. Set up VPN server. Server Mode: Remote Access (SSL/TLS + User Auth). Backend for Authentication: Local Database (will be FreeRADIUS at some point). Protocol: UDP. Local Port: something randomish. Peer Certificate Authority: use the interal CA created earlier. Server Certificate: Use the server certificate created earlier. DH Parameter length (bits): 4096. Encryption Algorithm: AES-256-CBC (256-bit), this has hardware crypto support on pfSense routers. Auth digest algorithm: SHA512 (512-bit). Hardware Crypto: BSD Cryptodev engine- RSA, DSA, DH, AES-128-CBC, AES-192-CBC, AES-256-CBC. Certificate Depth: One. Strict User-CN Matching: check Enforce Match once it is confirmed working. IPv4 Tunnel Network: Set the new VPN network. IPv6 Tunnel Network: leave blank. Redirect Gateway: unchecked.  IPv4 Local network(s): set the local LAN network. IPv6 Local network(s): leave blank. Compression: Enabled with Adaptive Compression. Inter-client communication: Checked. Disable IPv6: Checked. Dynamic IP: Unchecked, at least for now. Topology: subnet. DNS Default Domain: Checked, and set domain. DNS Server enable: Checked. DNS Server 1: enter servers. Save.
- \item System --> User Manager. Add user for VPN. Certificate: Check to create user certificate. Descriptive name: username.domainname. Certificate Authority: Select internal CA created above. Key length: 4096. Lifetime: 1095.
- \item VPN --> OpenVPN, Client Export. Remote Access Server: Select the VPN server created earlier. Verify Server CN: automatic. Block Outside DNS: Checked. At the bottom, export as Standard Configurations, Archive to use with another pfSense server. To use with OpenVPN in F-Droid (Android), use Inline Configurations (Android).
+ \item System --> Cert. Manager. Set up internal certificate authority. XXX Add Steps
+ \item System --> Cert. Manager. Create internal server certificate. XXX Add steps
+\end{enumerate}
+
+\subsection{OpenVPN Setup}
+\begin{enumerate}
+ \item \texttt{VPN} --> \texttt{OpenVPN}
+ \item Set up VPN server.
+ \item \texttt{Server Mode}: \texttt{Remote Access (SSL/TLS + User Auth)}.
+ \item \texttt{Backend for Authentication}: \texttt{Local Database} (will be FreeRADIUS at some point).
+ \item \texttt{Protocol}: \texttt{UDP}.
+ \item \texttt{Local Port}: something randomish. Note for later.
+ \item \texttt{Peer Certificate Authority}: use the interal CA created earlier.
+ \item \texttt{Server Certificate}: Use the server certificate created earlier.
+ \item \texttt{DH Parameter length (bits)}: \texttt{4096}.
+ \item \texttt{Encryption Algorithm}: \texttt{AES-256-CBC (256-bit)}. This algorithm has hardware crypto support on pfSense routers. In pfSense 2.4, \texttt{AES-256-GCM} may be supported and is preferred.
+ \item \texttt{Auth digest algorithm}: \texttt{SHA512 (512-bit)}.
+ \item \texttt{Hardware Crypto}: \texttt{BSD Cryptodev engine- RSA, DSA, DH, AES-128-CBC, AES-192-CBC, AES-256-CBC}.
+ \item \texttt{Certificate Depth}: \texttt{One}.
+ \item \texttt{Strict User-CN Matching}: check \texttt{Enforce Match} once VPN is confirmed working. Leave unchecked for now.
+ \item \texttt{IPv4 Tunnel Network}: Set the new VPN network.
+ \item \texttt{IPv6 Tunnel Network}: leave blank.
+ \item \texttt{Redirect Gateway}: unchecked.
+ \item \texttt{IPv4 Local network(s)}: set the local LAN network, in this case \texttt{10.72.9.0/24}.
+ \item \texttt{IPv6 Local network(s)}: leave blank.
+ \item \texttt{Compression}: \texttt{Enabled with Adaptive Compression}.
+ \item \texttt{Inter-client communication}: Checked.
+ \item \texttt{Disable IPv6}: Checked.
+ \item \texttt{Dynamic IP}: Unchecked, at least for now.
+ \item \texttt{Topology}: \texttt{subnet}.
+ \item \texttt{DNS Default Domain}: Checked, and set domain.
+ \item \texttt{DNS Server enable}: Checked.
+ \item \texttt{DNS Server 1}: enter servers.
+ \item Hit \texttt{Save}.
+\end{enumerate}
+
+\subsection{OpenVPN User Certificate Creation}
+Each user needs their own certificate, which can be tied to their user account on the firewall. Note, FreeRADIUS will be used for user authentication in the future.
+
+XXX this needs to be checked.
+
+\begin{enumerate}
+ \item \texttt{System} --> \texttt{User Manager}
+ \item Click \texttt{Add}, to create a new VPN user.
+ \item \texttt{Certificate}: Check to create user certificate.
+ \item \texttt{Descriptive name}: enter a \texttt{username.domainname}, such as \texttt{jebbavpn.alephobjects.com}.
+ \item \texttt{Certificate Authority}: Select internal CA created above.
+ \item \texttt{Key length}: \texttt{2048}.
+ \item \texttt{Lifetime}: \texttt{1095}.
+ \item Hit \texttt{Save}.
+\end{enumerate}
+
+\subsection{OpenVPN User Certificate Export}
+Each user needs their own certificate, which can be tied to their user account on the firewall. Note, FreeRADIUS will be used for user authentication in the future.
+
+XXX this needs to be checked.
+
+\begin{enumerate}
+ \item \texttt{VPN} --> \texttt{OpenVPN}, \texttt{Client Export}
+ \item \texttt{Remote Access Server}: Select the VPN server created earlier.
+ \item \texttt{Verify Server CN}: \texttt{automatic}.
+ \item \texttt{Block Outside DNS}: Checked.
+ \item At the bottom, export as \texttt{Standard Configurations}, \texttt{Archive} to use with another pfSense server (XXX correct?).
+ \item To use with OpenVPN in F-Droid (Android), use \texttt{Inline Configurations (Android)}.
 \end{enumerate}
 
 
 \subsection{Turn off Internet via LAN}
+If the WAN gateway has been set up, disable the LAN gateway.
+
 \begin{enumerate}
- \item Interfaces --> LAN. When you're done using the LAN as any sort of gateway. Change IPv4 Upstream gateway to None. Save. Apply Changes.
+ \item \texttt{Interfaces} --> \texttt{LAN}
+ \item Change \texttt{IPv4 Upstream gateway} to \texttt{None}.
+ \item Hit \texttt{Save}.
+ \item Hit \texttt{Apply Changes}.
 \end{enumerate}
 
-\subsection{More Backup}
+\subsection{Backup}
 Make another backup.
 
 \begin{enumerate}
- \item Diagnostics --> Backup \& Restore. Backup.
- \item Diagnostics --> Reboot and make sure everything comes up clean.
+ \item \texttt{Diagnostics} --> \texttt{Backup \& Restore}, \texttt{Backup}.
+ \item Make a backup and store in the proper location.
 \end{enumerate}
 
+\subsection{Reboot}
+Reboot to make sure everything comes up clean.
+
+\begin{enumerate}
+ \item \texttt{Diagnostics} --> \texttt{Reboot}
+\end{enumerate}
 
 \section{NAT}
 Network Address Translation.

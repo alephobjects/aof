@@ -41,7 +41,7 @@
 % Source code highlighting
 \usepackage{mdframed} % /usr/share/doc/texlive-doc/latex/mdframed/mdframed.pdf
 \usepackage{minted}   % /usr/share/doc/texlive-doc/latex/minted/minted.pdf
-\setminted{autogobble, breaklines, breakanywhere, breakautoindent, funcnamehighlighting,style=manni}
+\setminted{autogobble, breaklines, breakanywhere, breakautoindent, funcnamehighlighting,style=manni,fontsize=\scriptsize}
 % fontsize
 \setmintedinline{breaklines, breakanywhere}
 \surroundwithmdframed{minted}
@@ -54,13 +54,13 @@ leftmargin=1cm,rightmargin=1cm
 
 \usepackage{smartdiagram}
 \usesmartdiagramlibrary{additions}
-\usepackage{comment}  % Padding? /usr/share/doc/texlive-doc/latex/comment/comment.pdf
-\usepackage{graphicx} % Docs: /usr/share/doc/texlive-doc/latex/graphics/graphicx.pdf
-\usepackage{epstopdf} % Docs: /usr/share/doc/texlive-doc/latex/oberdiek/epstopdf.pdf
-\usepackage[colorlinks=true]{hyperref}
-    % Docs: http://en.wikibooks.org/wiki/LaTeX/Hyperlinks
+\usepackage{comment}  % /usr/share/doc/texlive-doc/latex/comment/comment.pdf
+\usepackage{graphicx} % /usr/share/doc/texlive-doc/latex/graphics/graphicx.pdf
+\usepackage{epstopdf} % /usr/share/doc/texlive-doc/latex/oberdiek/epstopdf.pdf
+\usepackage[colorlinks=true,linkcolor=ao-purple]{hyperref} % /usr/share/doc/texlive-doc/latex/hyperref/hyperref.pdf
     %       http://www.tug.org/applications/hyperref/manual.html
-\usepackage{url}
+    % /usr/share/doc/texlive-doc/latex/hyperref/hyperref.pdf
+%\usepackage{url} % /usr/share/doc/texlive-doc/latex/url/url.pdf % Use href
 \graphicspath{{./images/}}
 
 \makeindex
@@ -227,8 +227,8 @@ leftmargin=1cm,rightmargin=1cm
 
 %%% LIST OF LISTINGS %%%
 %\renewcommand*{\lofheadstart}{\vspace{1cm}}
-\clearpage
-\listoflistings
+%\clearpage
+%\listoflistings
 %%% END LIST OF LISTINGS %%%
 
 %%% CHAPTER STYLE %%%
