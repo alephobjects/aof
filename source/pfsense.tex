@@ -9,9 +9,11 @@
 % International Public License (CC BY-SA 4.0) by Aleph Objects, Inc.
 %
 \begin{figure}[h!]
+\begin{center}
 \includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-pfsense.png}
  \caption{pfSense Website}
  \label{fig:www-pfsense}
+\end{center}
 \end{figure}
 
 \section{Overview}
@@ -61,9 +63,11 @@ Follow these steps to get the hardware set up to configure the pfSense router.
 
 \subsection{Setup via Serial Connection}
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-console.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-console.png}
  \caption{pfSense Console}
  \label{fig:pfsense-console}
+\end{center}
 \end{figure}
 
 With the hardware all plugged in, connect with minicom and do some initial configuration via the USB port.
@@ -83,9 +87,11 @@ sudo minicom -D /dev/ttyUSB0
 \end{minted}
 
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-minicom-settings.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-minicom-settings.png}
  \caption{pfSense Minicom Settings}
  \label{fig:pfsense-minicom-settings}
+\end{center}
 \end{figure}
  \item The connection settings are 115200 baud, 8N1, no hardware flow control, no software flow control. Note, hardware flow control is on by default and may prevent you from entering text into the console. To change these settings in minicom, hit \mintinline{sh}{ctrl-a} then the letter \mintinline{sh}{o}. In the menu, with the arrow keys, select \mintinline{sh}{Serial port setup}.
  \item Plug in power to the pfSense router, and watch it boot up in minicom. It takes 1 minute, 20 seconds for a SG-4860 to cold boot with a default configuration.
@@ -257,9 +263,11 @@ Attackers might be trying to steal your information from 10.72.9.254 (for exampl
 \end{minted}
 
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-invalidssl.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-invalidssl.png}
  \caption{pfSense Cert Authority Invalid}
  \label{fig:pfsense-invalidssl}
+\end{center}
 \end{figure}
 
  \item In your browser hit Advanced, which will display this text:
@@ -274,79 +282,101 @@ Proceed to 10.72.9.254 (unsafe)
  \item Log in to firewall (e.g. https://10.72.9.254). The initial username is admin and the password is pfsense.
 
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-login.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-login.png}
  \caption{pfSense Login}
  \label{fig:pfsense-login}
+\end{center}
 \end{figure}
 
  \item Start Wizard, hit Next.
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-01.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-01.png}
  \caption{pfSense Wizard}
  \label{fig:pfsense-wizard-01}
+\end{center}
 \end{figure}
 
  \item pfSense Gold, Next.
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-02.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-02.png}
  \caption{pfSense Gold}
  \label{fig:pfsense-wizard-02}
+\end{center}
 \end{figure}
 
  \item Hostname: set hostname and domain. In this example, fw729 and alephobjects.com. DNS servers can be blank for now.
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-03.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-03.png}
  \caption{pfSense Wizard General Information}
  \label{fig:pfsense-wizard-03}
+\end{center}
 \end{figure}
 
  \item Time Server Hostname, leave at default. Set timezone to America/Denver.
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-04.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-04.png}
  \caption{pfSense Wizard Timezone}
  \label{fig:pfsense-wizard-04}
+\end{center}
 \end{figure}
 
  \item Configure WAN interface. Leave the WAN interface ethernet cable unplugged. In later steps, once we get the basic firewalling etc. running, we can plug in WAN and configure it. For now, take the WAN DHCP defaults.
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-05.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-05.png}
  \caption{pfSense Wizard WAN Configuration}
  \label{fig:pfsense-wizard-05}
+\end{center}
 \end{figure}
 
  \item Configure LAN interface. Set the static IP and netmask, in this example 10.72.9.254 and 24.
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-06.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-06.png}
  \caption{pfSense Wizard LAN Configuration}
  \label{fig:pfsense-wizard-06}
+\end{center}
 \end{figure}
 
  \item Set Admin WebGUI Password. Choose something unique and following good practices. Use a good password generator.
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-07.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-07.png}
  \caption{pfSense Wizard Admin Password}
  \label{fig:pfsense-wizard-07}
+\end{center}
 \end{figure}
 
  \item Hit Reload to use the new configuration.
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-08.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-08.png}
  \caption{pfSense Wizard Reload Configuration}
  \label{fig:pfsense-wizard-08}
+\end{center}
 \end{figure}
 
  \item Watch wizard reload. This should take less than a minute.
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-09.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-09.png}
  \caption{pfSense Wizard Reloading}
  \label{fig:pfsense-wizard-09}
+\end{center}
 \end{figure}
 
  \item The wizard is now complete. Click \texttt{here} in \texttt{Click here to continue on to pfSense webConfigurator.}
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-wizard-10.png}
- \caption{pfSense Wizard Reloading}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-wizard-10.png}
+ \caption{pfSense Wizard Complete}
  \label{fig:pfsense-wizard-10}
+\end{center}
 \end{figure}
 
 \end{enumerate}
@@ -355,14 +385,54 @@ Proceed to 10.72.9.254 (unsafe)
 Now that the basic setup of the firewall is done...there is more...
 Upon logging in the first time, you are greeted with a basic Dashboard. Menu items are across the top.
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{pfsense-dashboard-01.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-dashboard-01.png}
  \caption{pfSense Initial Dashboard}
  \label{fig:pfsense-dashboard-01}
+\end{center}
 \end{figure}
 
+
+\subsection{Set Up a New User}
+%\begin{figure}[h!]
+%\begin{center}
+%\includegraphics[keepaspectratio=true,height=0.15\textheight,width=0.15\textwidth,angle=0]{pfsense-menu-system-user.png}
+% \caption{pfSense Menu, System User Manager}
+% \label{fig:pfsense-menu-system-user}
+%\end{center}
+%\end{figure}
+
 \begin{enumerate}
- \item System --> User Manager. Click Add. Add Username, Password, Full name, Experation date leave blank. Move to add to Group membership ``admins'' (presuming this is an admin). Add ssh key, if you want to ssh in. Certificate, leave blank for now (can be used for OpenVPN/RADIUS). 
- \item Log out and log back in as newly created user.
+ \item Go to the top \texttt{System} tab and click \texttt{User Manager}.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-system-user-users.png}
+ \caption{pfSense Menu: System, User Manager, Users}
+ \label{fig:pfsense-system-user-users}
+\end{center}
+\end{figure}
+ \item Click Add.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-system-user-add.png}
+ \caption{pfSense Menu: System, User Manager, Add User}
+ \label{fig:pfsense-system-user-add}
+\end{center}
+\end{figure}
+
+ \item Add Username, jebba in this example.
+ \item Add a good, well-generated unique password.
+ \item Full name.
+ \item Experation date leave blank.
+ \item Move to add to Group membership ``admins''.
+ \item Certificate, leave blank for now (one will be set up later with OpenVPN).
+ \item Add ssh key, if you want to ssh in.
+ \item Hit Save.
+ \item Log out as the admin user by clicking the logout icon in the upper right corner of the pfSense web page.
+ \item Log back in as the newly created user in the above steps.
+
+\subsection{Advanced System Configuration}
  \item Goto System --> Advanced. Under Admin Access. Set TCP port to randomish port between 1 and 65535. This will be the new pfSense web interface port address. Max processes: 16 (2 is too low, not sure what is ideal). Check WebGUI redirect to disable port 80. Check enable Secure Shell Server. Disable password login. Pick randomish port for SSH. Check to password protect Console menu. Save.
  \item At this point, you can optionally SSH into the firewall if a key was set up for the user.
  \item Under System --> Advanced, Networking. Uncheck Allow IPv6, to disable IPv6 (yay!). Check boxes for: Hardware Checksum Offloading, Hardware TCP Segmentation Offloading, Hardware Large Receive Offloading. These need to be disabled because/if Suricata is used in Inline mode. If it isn't, these can be unchecked and if the hardware is good/can handle it, it will likely be faster. (Side note, enabling Hardware Checksum Offloading breaks networking in a KVM.) Save.
@@ -494,9 +564,11 @@ Suricata is being used as an Intrusion Detection System.
 It is preferred over Snort as Suricata is multithreaded and Snort isn't.
 
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-suricata.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{www-suricata.png}
  \caption{Suricata Website}
  \label{fig:www-suricata}
+\end{center}
 \end{figure}
 
 \begin{itemize}
@@ -532,9 +604,11 @@ forwarding.
 
 \section{OpenVPN}
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-openvpn.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{www-openvpn.png}
  \caption{OpenVPN Website}
  \label{fig:www-openvpn}
+\end{center}
 \end{figure}
 
 
@@ -585,9 +659,11 @@ OpenSSH from OpenBSD is used. The BSD shell is a bit different from GNU.
 DNS forwarding is provided by Dnsmasq.
 
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-dnsmasq.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{www-dnsmasq.png}
  \caption{Dnsmasq Website}
  \label{fig:www-dnsmasq}
+\end{center}
 \end{figure}
 
 
@@ -621,9 +697,11 @@ instance, if a configuration change is made to the DHCP server, it can
 \section{Reporting}
 
 \begin{figure}[h!]
-\includegraphics[keepaspectratio=true,height=1.10\textheight,width=1.00\textwidth,angle=0]{www-ntopng.png}
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{www-ntopng.png}
  \caption{ntopng Website}
  \label{fig:www-ntopng}
+\end{center}
 \end{figure}
 
 \begin{itemize}
