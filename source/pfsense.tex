@@ -438,6 +438,7 @@ The main dashboard gives an overview of the system. It will be configured more i
 \subsection{Moar Configuration}
 Now that the basic setup of the firewall is done...there is more...
 Upon logging in the first time, you are greeted with a basic Dashboard. Menu items are across the top.
+See figure \ref{fig:pfsense-dashboard-01}.
 
 \subsection{Set Up a New User}
 %\begin{figure}[h!]
@@ -544,6 +545,17 @@ route -n show 0.0.0.0 # Will give error if no gateway is set
 \subsection{Advanced Networking Configuration}
 Note, the \texttt{System} --> \texttt{Advanced}, \texttt{Firewall \& NAT} section can be left at defaults.
 
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-sys-adv-net}
+ \caption{pfSense Menu: System, Advanced, Networking}
+ \label{fig:pfsense-sys-adv-net}
+\end{center}
+\end{figure}
+
+Turn off IPv6 and network hardware processing for Suricata.
+See figure \ref{fig:pfsense-sys-adv-net}.
+
 \begin{enumerate}
  \item Under \texttt{System} --> \texttt{Advanced}, \texttt{Networking} tab.
  \item Uncheck \texttt{Allow IPv6}, to disable IPv6 (yay!).
@@ -554,16 +566,39 @@ Note, the \texttt{System} --> \texttt{Advanced}, \texttt{Firewall \& NAT} sectio
 \end{enumerate}
 
 \subsection{Advanced Miscellaneous Configuration}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.80\textheight,width=0.90\textwidth,angle=0]{pfsense-sys-adv-misc.png}
+ \caption{pfSense Menu: System, Advanced, Miscellaneous}
+ \label{fig:pfsense-sys-adv-misc}
+\end{center}
+\end{figure}
+
+Miscellaneous configuration, such as hardware accelerated crypto.
+See figure \ref{fig:pfsense-sys-adv-misc}.
+
 \begin{enumerate}
  \item \texttt{System} --> \texttt{Advanced}, \texttt{Miscellaneous}.
  \item \texttt{Cryptographic Hardware} should be set to \texttt{AES-NI} for any hardware from pfSense. For other hardware, check dmesg.
  \item \texttt{Thermal Sensors}: use \texttt{Intel Core* CPU on-die thermal sensor}.
  \item \texttt{Hard disk standby time}, set to \texttt{6 minutes} (not sure this really has any effect).
  \item \texttt{Host UUID}, check \texttt{Do NOT send HOST UUID with user agent}.
+ \item Take defaults for everything else.
  \item Hit \texttt{Save}.
 \end{enumerate}
 
 \subsection{Advanced Notifications Configuration}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[keepaspectratio=true,height=0.50\textheight,width=0.75\textwidth,angle=0]{pfsense-sys-adv-notif.png}
+ \caption{pfSense Menu: System, Advanced, Notifications}
+ \label{fig:pfsense-sys-adv-notif.png}
+\end{center}
+\end{figure}
+
+Notifications configuration, disable.
+See figure \ref{fig:pfsense-sys-adv-notif.png}
+
 \begin{enumerate}
  \item \texttt{System} --> \texttt{Advanced}, \texttt{Notifications}.
  \item Check to \texttt{Disable Growl Notifications}
