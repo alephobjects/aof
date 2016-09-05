@@ -164,10 +164,13 @@ One moment while the settings are reloading... done!
 \end{minted}
 
  \item Note the MAC address for the LAN interface.
- \item Copy MAC address to main DHCP/DNS server, and reserve IP address.
- \item Set DHCP for WAN, disable IPv6. This is assuming the WAN is on an interface with DHCP (e.g. cable modem). If it is statically set, set
+ \item Copy MAC address to main DHCP/DNS server, and reserve IP address. In other words, set up this new firewall on the local LAN DHCP server (if available).
+ \item Set DHCP for WAN. This is assuming the WAN is on an interface with DHCP (e.g. cable modem). If it is statically set, set
 the address here.
- \item In the pfSense menu, select \texttt{2) Set interface(s) IP address}, then \texttt{1} to select the WAN interface. See console listing below.
+ \item Disable IPv6.
+the address here.
+ \item In the pfSense menu, select \texttt{2) Set interface(s) IP address},
+ \item Then \texttt{1} to select the WAN interface. See console listing below.
 
 \begin{minted}[fontsize=\scriptsize,style=bw]{sh}
 Enter an option: 2
@@ -198,8 +201,12 @@ The IPv4 WAN address has been set to dhcp
 Press <ENTER> to continue.
 \end{minted}
 
- \item Set static IP for LAN, using \texttt{10.72.9.254/24} as an example. Do not set an IPv6 address. Don't enter a gateway. Don't enable DHCP server (for now, at least).
- \item In the pfSense menu, select \texttt{2) Set interface(s) IP address}, then \texttt{2} to select the LAN interface. See console listing below.
+ \item Set static IP for LAN, using \texttt{10.72.9.254/24} as an example.
+ \item Do not set an IPv6 address.
+ \item Don't enter a gateway.
+ \item Don't enable DHCP server (for now, at least).
+ \item In the pfSense menu, select \texttt{2) Set interface(s) IP address}.
+ \item Then \texttt{2} to select the LAN interface. See console listing below.
 \begin{minted}[fontsize=\scriptsize,style=bw]{sh}
 Enter an option: 2
 
